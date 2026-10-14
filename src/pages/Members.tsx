@@ -1,282 +1,424 @@
-import { useState, useEffect } from "react"
-import { useSearchParams } from "react-router-dom"
-import { Search, Filter, Briefcase } from "lucide-react"
-import { motion } from "framer-motion"
-import { members,  } from "../data/members"
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { AnimatePresence, motion, useMotionTemplate, useMotionValue, useSpring } from 'framer-motion';
+import { ArrowUpRight, Mail, Search, X } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
+import { members } from '../data/members';
+import type { Member } from '../data/members';
+import groupe from '../assets/&&&.jpeg';
+import PageHero from '../components/ui/PageHero';
+import { EASE, Reveal } from '../components/ui/Reveal';
+import LuxButton from '../components/ui/LuxButton';
+import { lockScroll } from '../lib/smooth';
 
-const MotionDiv = motion.div
+type Instance = 'all' | 'bureau' | 'commissions' | 'membres';
 
-const Members = () => {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedSection, setSelectedSection] = useState(
-    searchParams.get("section") || "all"
-  )
-  const [selectedPosition, setSelectedPosition] = useState("all")
-  const [selectedExpertise, setSelectedExpertise] = useState("all")
+const instanceOf = (m: Member): Exclude<Instance, 'all'> => {
+  if (m.role === 'Bureau Exécutif') return 'bureau';
+  if (m.position === 'Membre Simple') return 'membres';
+  return 'commissions';
+};
 
-  const [filteredMembers, setFilteredMembers] =
-    useState<Member[]>(members)
+const displayPosition = (m: Member) => (m.position === 'Membre Simple' ? 'Membre' : m.position);
 
+const memberWhatsapp = (m: Member) =>
+  `https://wa.me/221${m.phone?.replace(/\D/g, '')}?text=${encodeURIComponent(
+    `Bonjour ${m.fullName}, je vous contacte via le site officiel de l'AEEOM.`,
+  )}`;
+
+/* ============ Fiche membre ============ */
+const MemberModal = ({ member, onClose }: { member: Member | null; onClose: () => void }) => {
   useEffect(() => {
-    let filtered = members
-
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (m) =>
-          m.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          m.expertise.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          m.position.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    }
-
-    if (selectedSection !== "all") {
-      filtered = filtered.filter(
-        (m) => m.section === selectedSection
-      )
-    }
-
-    if (selectedPosition !== "all") {
-      filtered = filtered.filter(
-        (m) => m.position === selectedPosition
-      )
-    }
-
-    if (selectedExpertise !== "all") {
-      filtered = filtered.filter(
-        (m) => m.expertise === selectedExpertise
-      )
-    }
-
-    setFilteredMembers(filtered)
-  }, [searchQuery, selectedSection, selectedPosition, selectedExpertise])
-
-  const positions = [
-    "Poste",
-    ...Array.from(new Set(members.map((m) => m.position))),
-  ]
-
-  const expertises = [
-    "Fonction",
-    ...Array.from(new Set(members.map((m) => m.expertise))),
-  ]
+    if (!member) return;
+    lockScroll(true);
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      lockScroll(false);
+    };
+  }, [member, onClose]);
 
   return (
-    <div className="bg-white min-h-screen">
-
-      {/* HERO */}
-      <section className="relative bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 text-white py-28 sm:py-32 lg:py-36 overflow-hidden">
-  {/* HALOS LUMINEUX */}
-  <div className="absolute -top-20 -left-20 w-[400px] h-[400px] bg-emerald-400/20 rounded-full blur-[150px] animate-pulse pointer-events-none" />
-  <div className="absolute -bottom-28 -right-28 w-[500px] h-[500px] bg-emerald-300/20 rounded-full blur-[180px] animate-pulse pointer-events-none" />
-
-  <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 text-center">
-    {/* Badge Premium */}
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
-      className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 mb-6 mx-auto shadow-lg"
-    >
-      <span className="w-2 h-2 bg-emerald-400 rounded-full animate-ping"></span>
-      <span className="text-sm tracking-widest uppercase font-semibold text-emerald-200">
-        Communauté d’Excellence
-      </span>
-    </motion.div>
-
-    {/* TITRE */}
-    <motion.h1
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1 }}
-      className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight"
-    >
-      Répertoire des{" "}
-      <span className="bg-gradient-to-r from-emerald-300 to-emerald-100 bg-clip-text text-transparent">
-        Membres
-      </span>
-    </motion.h1>
-
-    {/* DESCRIPTION */}
-    <motion.p
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1, delay: 0.2 }}
-      className="mt-6 text-lg sm:text-xl md:text-2xl text-emerald-200 max-w-3xl mx-auto leading-relaxed"
-    >
-      Découvrez les talents, les parcours et les expertises qui composent
-      notre réseau d’exception. Une communauté engagée, ambitieuse et tournée vers l’impact.
-    </motion.p>
-
-    {/* DIVIDER PREMIUM */}
-    <motion.div
-      initial={{ width: 0 }}
-      animate={{ width: "140px" }}
-      transition={{ duration: 1.2, delay: 0.4 }}
-      className="h-[3px] bg-gradient-to-r from-emerald-400 to-transparent mt-10 rounded-full mx-auto"
-    />
-  </div>
-</section>
-
-
-      {/* FILTERS */}
-      <section className="py-12 bg-gray-50 border-b">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row gap-4">
-
-         <div className="flex-1 relative">
-  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-  <input
-    type="text"
-    placeholder="Rechercher par nom..."
-    value={searchQuery}
-    onChange={(e) => {
-      const value = e.target.value;
-      setSearchQuery(value);
-
-      // Filtrage des membres uniquement par nom
-      const filtered = mockMembers.filter(member =>
-        member.fullName.toLowerCase().includes(value.toLowerCase())
-      );
-
-      setFilteredMembers(filtered);
-    }}
-    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-  />
-</div>
-
-
-          <select
-            value={selectedSection}
-            onChange={(e) => setSelectedSection(e.target.value)}
-            className="px-4 py-3 border rounded-lg bg-white"
-          >
-            <option value="all">Toutes les sections</option>
-            <option value="dakar">Dakar</option>
-            <option value="ziguinchor">Ziguinchor</option>
-          </select>
-
-          <select
-            value={selectedPosition}
-            onChange={(e) => setSelectedPosition(e.target.value)}
-            className="px-4 py-3 border rounded-lg bg-white"
-          >
-            {positions.map((pos) => (
-              <option key={pos} value={pos}>
-                {pos}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={selectedExpertise}
-            onChange={(e) => setSelectedExpertise(e.target.value)}
-            className="px-4 py-3 border rounded-lg bg-white"
-          >
-            {expertises.map((exp) => (
-              <option key={exp} value={exp}>
-                {exp}
-              </option>
-            ))}
-          </select>
-        </div>
-      </section>
-
-      {/* GRID */}
-    <section className="py-20 bg-emerald-50">
-  <div className="max-w-7xl mx-auto px-6">
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
-
-      {filteredMembers.map((member, i) => (
-        <MotionDiv
-          key={member.id}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.1 }}
-          viewport={{ once: true }}
-          className="relative group"
+    <AnimatePresence>
+      {member && (
+        <motion.div
+          className="fixed inset-0 z-[90] flex items-end justify-center bg-ink-950/80 backdrop-blur-md sm:items-center sm:p-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-label={member.fullName}
         >
-          {/* HALO PREMIUM DERRIERE CARTE */}
-          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-emerald-400/30 to-emerald-600/20 blur-3xl opacity-30 group-hover:opacity-60 transition-opacity duration-700 -z-10"></div>
-
-          {/* CARTE */}
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden hover:-translate-y-2 transition-transform duration-500">
-            
-            {/* IMAGE + BADGE */}
-            <div className="relative aspect-[4/4.5] overflow-hidden">
+          <motion.div
+            initial={{ y: 60, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 40, opacity: 0 }}
+            transition={{ duration: 0.7, ease: EASE }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative grid max-h-[92svh] w-full max-w-5xl overflow-y-auto bg-ivory-50 md:grid-cols-5"
+            data-lenis-prevent
+          >
+            <button
+              onClick={onClose}
+              aria-label="Fermer"
+              className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-ink-950 text-ivory-50 transition-colors hover:bg-gold-500 hover:text-ink-950"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <div className="relative md:col-span-2">
               <img
                 src={member.photo}
                 alt={member.fullName}
-                className="w-full h-full object-cover object-[center_25%]  transition-transform duration-1000 group-hover:scale-105"
+                className="h-[42svh] w-full object-cover object-[center_20%] md:h-full md:min-h-[560px]"
               />
-
-              {/* BADGE DYNAMIQUE */}
-              <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full font-semibold text-white shadow-md 
-                              bg-gradient-to-r from-emerald-400 via-emerald-600 to-emerald-500
-                              animate-gradient-x text-xs">
-                {member.section === 'dakar' ? 'Dakar' : 'Ziguinchor'}
-              </div>
             </div>
-
-            {/* CONTENU */}
-            <div className="p-6 flex flex-col justify-between h-[200px]">
-              <div>
-                <h3 className="text-xl font-bold text-emerald-950 mb-1">{member.fullName}</h3>
-                <p className="text-emerald-700 font-medium text-sm mb-3">{member.position}</p>
-                <div className="flex items-center gap-2 text-gray-600 text-sm mb-4">
-                  <Briefcase className="w-4 h-4" />
-                  <span className="line-clamp-2">{member.expertise}</span>
-                </div>
-              </div>
-
-              {/* BOUTONS HORIZONTAUX PREMIUM */}
-              <div className="flex gap-3 mt-4">
+            <div className="flex flex-col p-8 sm:p-12 md:col-span-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-gold-700">
+                Section {member.section === 'dakar' ? 'Dakar' : 'Ziguinchor'} · {member.role}
+              </p>
+              <h2 className="mt-4 font-display text-5xl font-medium leading-none text-ink-950">{member.fullName}</h2>
+              <p className="mt-3 font-display text-2xl text-gold-700">{displayPosition(member)}</p>
+              <div className="hairline my-8" />
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-900/45">Expertise</p>
+              <p className="mt-2 text-ink-950">{member.expertise}</p>
+              <p className="mt-8 text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-900/45">Parcours</p>
+              <p className="mt-2 leading-relaxed text-ink-900/70">{member.bio}</p>
+              <div className="mt-auto flex flex-wrap gap-3 pt-10">
                 {member.phone && (
                   <a
-                    href={`https://wa.me/221${member.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Bonjour ${member.fullName}, je vous contacte via le site officiel.`)}`}
+                    href={memberWhatsapp(member)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-emerald-900 to-emerald-700 text-white text-sm font-semibold rounded-xl shadow-lg hover:shadow-2xl hover:scale-[1.05] transition-all duration-300"
+                    className="inline-flex items-center gap-3 rounded-full bg-ink-950 px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-ivory-50 transition-colors duration-500 hover:bg-gold-500 hover:text-ink-950"
                   >
-                    WhatsApp
+                    <FaWhatsapp className="h-4 w-4" /> WhatsApp
                   </a>
                 )}
-
                 {member.email && (
                   <a
                     href={`mailto:${member.email}`}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-white border border-emerald-200 text-emerald-900 text-sm font-semibold rounded-xl shadow-md hover:shadow-xl hover:bg-emerald-50 hover:scale-[1.05] transition-all duration-300"
+                    className="inline-flex items-center gap-3 rounded-full border border-ink-900/20 px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-ink-950 transition-colors duration-500 hover:border-ink-950 hover:bg-ink-950 hover:text-ivory-50"
                   >
-                    Email
+                    <Mail className="h-4 w-4" /> Email
                   </a>
                 )}
               </div>
             </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
 
+/* ============ Carte membre ============ */
+// Traitement unifié des portraits (photos d'origines très diverses) :
+// noir & blanc teinté vert sur les écrans à souris ([@media(hover:hover)]), couleur révélée au survol.
+
+const MemberCard = ({ member, index, onOpen }: { member: Member; index: number; onOpen: (m: Member) => void }) => {
+  const rx = useMotionValue(0);
+  const ry = useMotionValue(0);
+  const gx = useMotionValue(50);
+  const gy = useMotionValue(50);
+  const rotateX = useSpring(rx, { stiffness: 160, damping: 18 });
+  const rotateY = useSpring(ry, { stiffness: 160, damping: 18 });
+  const glare = useMotionTemplate`radial-gradient(circle at ${gx}% ${gy}%, rgba(255,255,255,0.35), transparent 55%)`;
+
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!window.matchMedia('(hover: hover)').matches) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
+    ry.set((px - 0.5) * 12);
+    rx.set((0.5 - py) * 12);
+    gx.set(px * 100);
+    gy.set(py * 100);
+  };
+  const onLeave = () => {
+    rx.set(0);
+    ry.set(0);
+  };
+
+  return (
+    <motion.button
+      layout
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.96 }}
+      transition={{ duration: 0.8, ease: EASE, delay: Math.min(index % 8, 7) * 0.05 }}
+      onClick={() => onOpen(member)}
+      className="group text-left [perspective:1100px]"
+      aria-label={`Voir le profil de ${member.fullName}`}
+    >
+      <div className="relative">
+        {/* Cadre doré décalé */}
+        <span className="pointer-events-none absolute inset-0 border border-gold-500/0 transition-all duration-700 ease-lux group-hover:translate-x-2.5 group-hover:translate-y-2.5 group-hover:border-gold-500/70" />
+
+        <motion.div
+          onMouseMove={onMove}
+          onMouseLeave={onLeave}
+          style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
+          className="relative aspect-[3/4] overflow-hidden rounded-sm bg-ink-900 shadow-[0_10px_30px_-15px_rgba(6,20,14,0.35)] transition-shadow duration-700 group-hover:shadow-[0_35px_60px_-20px_rgba(6,20,14,0.55)]"
+        >
+          <img
+            src={member.photo}
+            alt={member.fullName}
+            loading="lazy"
+            className={`h-full w-full object-cover object-[center_20%] transition-[filter,transform] duration-1000 ease-lux group-hover:scale-[1.06] [@media(hover:hover)]:brightness-95 [@media(hover:hover)]:contrast-[1.08] [@media(hover:hover)]:grayscale [@media(hover:hover)]:group-hover:brightness-100 [@media(hover:hover)]:group-hover:grayscale-0`}
+          />
+          {/* Teinte vert forêt (duotone) */}
+          <div
+            className={`pointer-events-none absolute inset-0 hidden bg-ink-700 opacity-50 mix-blend-color transition-opacity duration-700 group-hover:opacity-0 [@media(hover:hover)]:block`}
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-950/70 via-transparent to-ink-950/25" />
+
+          {/* Numéro + statut */}
+          <span className="absolute left-4 top-4 font-display text-lg text-ivory-50/85">
+            {String(index + 1).padStart(2, '0')}
+          </span>
+          {instanceOf(member) === 'bureau' && (
+            <span className="absolute right-3 top-3 rounded-full border border-gold-400/60 bg-ink-950/40 px-3 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-gold-300 backdrop-blur">
+              Bureau
+            </span>
+          )}
+
+          {/* Panneau d'informations au survol */}
+          <div
+            className={`absolute inset-x-0 bottom-0 hidden translate-y-full bg-gradient-to-t from-ink-950 via-ink-950/90 to-transparent p-5 pt-16 transition-transform duration-700 ease-lux group-hover:translate-y-0 [@media(hover:hover)]:block`}
+          >
+            <p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-gold-400">Expertise</p>
+            <p className="mt-1.5 line-clamp-2 text-sm leading-snug text-ivory-100">{member.expertise}</p>
+            <span className="mt-4 inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-gold-300">
+              Voir le profil <ArrowUpRight className="h-3.5 w-3.5" />
+            </span>
           </div>
-        </MotionDiv>
+
+          {/* Reflet lumineux qui suit la souris */}
+          <motion.div
+            style={{ background: glare }}
+            className="pointer-events-none absolute inset-0 opacity-0 mix-blend-soft-light transition-opacity duration-500 group-hover:opacity-100"
+          />
+        </motion.div>
+      </div>
+
+      <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.22em] text-gold-700">{displayPosition(member)}</p>
+      <h3 className="mt-1 font-display text-xl leading-tight text-ink-950 sm:text-2xl">{member.fullName}</h3>
+      <span className="mt-3 block h-px w-8 bg-gold-500 transition-all duration-700 ease-lux group-hover:w-full" />
+      <p className={`mt-3 line-clamp-1 text-xs text-ink-900/55 sm:text-sm [@media(hover:hover)]:hidden`}>{member.expertise}</p>
+    </motion.button>
+  );
+};
+
+const MemberGrid = ({ list, offset, onOpen }: { list: Member[]; offset: number; onOpen: (m: Member) => void }) => (
+  <motion.div layout className="grid grid-cols-2 gap-x-4 gap-y-14 sm:gap-x-7 md:grid-cols-3 lg:grid-cols-4">
+    <AnimatePresence mode="popLayout">
+      {list.map((m, i) => (
+        <MemberCard key={m.id} member={m} index={offset + i} onOpen={onOpen} />
       ))}
+    </AnimatePresence>
+  </motion.div>
+);
 
+/* ============ Présidence ============ */
+const PresidentSpotlight = ({ member, onOpen }: { member: Member; onOpen: (m: Member) => void }) => (
+  <Reveal className="mb-28">
+    <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
+      <div className="relative mx-auto w-full max-w-md lg:col-span-5 lg:max-w-none">
+        <span className="absolute -bottom-4 -right-4 left-4 top-4 border border-gold-500/60 sm:-bottom-6 sm:-right-6 sm:left-6 sm:top-6" />
+        <button onClick={() => onOpen(member)} className="group relative block w-full overflow-hidden rounded-sm bg-ink-900">
+          <img
+            src={member.photo}
+            alt={member.fullName}
+            className="aspect-[4/5] w-full object-cover object-[center_20%] transition-transform duration-[1600ms] ease-lux group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink-950/60 via-transparent to-transparent" />
+          <span className="absolute bottom-5 left-5 font-display text-lg text-ivory-50/90">01</span>
+        </button>
+      </div>
+      <div className="lg:col-span-7">
+        <span className="eyebrow text-gold-700">La Présidence</span>
+        <h2 className="h-display mt-6 text-[2.6rem] text-ink-950 sm:text-6xl lg:text-[4.2rem]">{member.fullName}</h2>
+        <p className="mt-3 font-display text-2xl text-gold-700">
+          {member.position} · Section {member.section === 'dakar' ? 'Dakar' : 'Ziguinchor'}
+        </p>
+        <div className="hairline my-8" />
+        <p className="max-w-2xl text-lg leading-relaxed text-ink-900/70">{member.bio}</p>
+        <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-900/45">
+          Expertise · <span className="text-ink-950">{member.expertise}</span>
+        </p>
+        <div className="mt-10">
+          <LuxButton onClick={() => onOpen(member)} variant="dark">
+            Voir le profil
+          </LuxButton>
+        </div>
+      </div>
     </div>
-  </div>
+  </Reveal>
+);
 
-  {/* ANIMATION DE GRADIENT DES BADGES */}
-  <style>
-    {`
-      @keyframes gradient-x {
-        0%, 100% { background-position: 0% }
-        50% { background-position: 100% }
-      }
-      .animate-gradient-x {
-        background-size: 200% 200%;
-        animation: gradient-x 3s ease infinite;
-      }
-    `}
-  </style>
-</section>
+/* ============ Page ============ */
+const Members = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [query, setQuery] = useState('');
+  const [instance, setInstance] = useState<Instance>('all');
+  const [selected, setSelected] = useState<Member | null>(null);
+  const section = searchParams.get('section') ?? 'all';
+  const closeModal = useCallback(() => setSelected(null), []);
 
+  const setSection = (value: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (value === 'all') next.delete('section');
+    else next.set('section', value);
+    setSearchParams(next, { replace: true, preventScrollReset: true });
+  };
 
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return members.filter(
+      (m) =>
+        (section === 'all' || m.section === section) &&
+        (instance === 'all' || instanceOf(m) === instance) &&
+        (!q || [m.fullName, m.expertise, m.position].some((v) => v.toLowerCase().includes(q))),
+    );
+  }, [query, section, instance]);
+
+  // Vue d'ensemble (aucun filtre d'instance ni recherche) : Présidence mise en avant + groupes titrés
+  const president = filtered.find((m) => m.position === 'Présidente');
+  const grouped = instance === 'all' && !query.trim() && filtered.length > 0;
+  const groups = useMemo(() => {
+    const rest = filtered.filter((m) => m !== president);
+    const defs = [
+      { key: 'bureau', eyebrow: 'Gouvernance', title: 'Bureau exécutif' },
+      { key: 'commissions', eyebrow: 'Pôles d’action', title: 'Commissions thématiques' },
+      { key: 'membres', eyebrow: 'La communauté', title: 'Membres' },
+    ] as const;
+    let offset = president ? 1 : 0;
+    return defs
+      .map((d) => {
+        const list = rest.filter((m) => instanceOf(m) === d.key);
+        const g = { ...d, list, offset };
+        offset += list.length;
+        return g;
+      })
+      .filter((g) => g.list.length > 0);
+  }, [filtered, president]);
+
+  const chip = (active: boolean) =>
+    `rounded-full px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.2em] transition-colors duration-300 ${
+      active ? 'bg-ink-950 text-ivory-50' : 'text-ink-900/60 hover:bg-ink-900/5 hover:text-ink-950'
+    }`;
+
+  return (
+    <div className="bg-ivory-50">
+      <PageHero
+        image={groupe}
+        crumbs={[{ label: 'Membres' }]}
+        eyebrow="Communauté d’excellence"
+        lines={['Répertoire des', <span className="text-gold-gradient">Membres.</span>]}
+        intro="Découvrez les talents, les parcours et les expertises qui composent notre réseau d’exception. Une communauté engagée, ambitieuse et tournée vers l’impact."
+        aside={
+          <div className="text-right">
+            <p className="font-display text-7xl text-gold-300">{members.length}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-ivory-100/60">profils publiés</p>
+          </div>
+        }
+      />
+
+      {/* Filtres */}
+      <section className="sticky top-0 z-30 border-b border-ink-900/10 bg-ivory-50/90 backdrop-blur-xl">
+        <div className="container-lux flex flex-col gap-4 py-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="relative w-full lg:max-w-sm">
+            <Search className="absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-900/40" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Rechercher un nom, un poste, une expertise"
+              className="w-full border-0 border-b border-ink-900/15 bg-transparent py-3 pl-8 pr-2 text-sm text-ink-950 placeholder:text-ink-900/40 focus:border-gold-600 focus:outline-none focus:ring-0"
+            />
+          </div>
+          <div className="-mx-1 flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {[
+              { v: 'all', l: 'Toutes sections' },
+              { v: 'dakar', l: 'Dakar' },
+              { v: 'ziguinchor', l: 'Ziguinchor' },
+            ].map((s) => (
+              <button key={s.v} onClick={() => setSection(s.v)} className={`shrink-0 ${chip(section === s.v)}`}>
+                {s.l}
+              </button>
+            ))}
+            <span className="mx-2 my-2 w-px shrink-0 bg-ink-900/15" />
+            {(
+              [
+                { v: 'all', l: 'Tous' },
+                { v: 'bureau', l: 'Bureau' },
+                { v: 'commissions', l: 'Commissions' },
+                { v: 'membres', l: 'Membres' },
+              ] as { v: Instance; l: string }[]
+            ).map((s) => (
+              <button key={s.v} onClick={() => setInstance(s.v)} className={`shrink-0 ${chip(instance === s.v)}`}>
+                {s.l}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Grille */}
+      <section className="container-lux min-h-[60vh] py-16 sm:py-24">
+        <p className="mb-10 text-[11px] font-semibold uppercase tracking-[0.3em] text-ink-900/45">
+          {filtered.length} {filtered.length > 1 ? 'profils' : 'profil'}
+        </p>
+
+        {grouped && president && <PresidentSpotlight member={president} onOpen={setSelected} />}
+
+        {filtered.length === 0 ? (
+          <div className="border border-dashed border-ink-900/20 px-8 py-24 text-center">
+            <p className="font-display text-4xl text-ink-950">Aucun profil ne correspond.</p>
+            <p className="mt-3 text-ink-900/60">
+              {section === 'ziguinchor'
+                ? 'Les profils de la Section Ziguinchor seront publiés prochainement.'
+                : 'Essayez un autre mot-clé ou réinitialisez les filtres.'}
+            </p>
+            <button
+              onClick={() => {
+                setQuery('');
+                setInstance('all');
+                setSection('all');
+              }}
+              className="link-lux mt-8 text-xs font-semibold uppercase tracking-[0.22em] text-gold-700"
+            >
+              Réinitialiser les filtres
+            </button>
+          </div>
+        ) : grouped ? (
+          <div className="space-y-28">
+            {groups.map((g) => (
+              <div key={g.key}>
+                <div className="mb-12 flex items-end justify-between gap-6 border-b border-ink-900/10 pb-6">
+                  <div>
+                    <span className="eyebrow text-gold-700">{g.eyebrow}</span>
+                    <h2 className="mt-4 font-display text-3xl text-ink-950 sm:text-4xl">{g.title}</h2>
+                  </div>
+                  <span className="font-display text-4xl text-gold-500/70 sm:text-5xl">
+                    {String(g.list.length).padStart(2, '0')}
+                  </span>
+                </div>
+                <MemberGrid list={g.list} offset={g.offset} onOpen={setSelected} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <MemberGrid list={filtered} offset={0} onOpen={setSelected} />
+        )}
+      </section>
+
+      <MemberModal member={selected} onClose={closeModal} />
     </div>
-  )
-}
+  );
+};
 
-export default Members
+export default Members;

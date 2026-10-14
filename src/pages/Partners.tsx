@@ -1,442 +1,217 @@
 import { useState } from 'react';
-import { Handshake, Building2, Award, CheckCircle, ArrowRight, Users } from 'lucide-react';
-import SectionHeader from '../components/common/SectionHeader';
-import Button from '../components/common/Button';
+import type { ChangeEvent, FormEvent } from 'react';
+import { Award, Building2, Handshake, Plus, Users } from 'lucide-react';
 import type { PartnershipRequest } from '../types';
+import { CONTACT, whatsappHref } from '../data/site';
+import graphicTeranga from '../assets/graphicTérange.jpeg';
+import kids from '../assets/kids_shop.jpeg';
+import galaTeam from '../assets/1.jpeg';
+import PageHero from '../components/ui/PageHero';
+import SectionTitle from '../components/ui/SectionTitle';
+import { Reveal, RevealLines } from '../components/ui/Reveal';
+import LuxButton from '../components/ui/LuxButton';
+import Field from '../components/ui/Field';
+
+const EMPTY: PartnershipRequest = {
+  organizationName: '',
+  contactPerson: '',
+  email: '',
+  phone: '',
+  partnershipType: '',
+  message: '',
+};
+
+const TYPES = [
+  { value: 'Partenariat Stratégique', label: 'Partenariat Stratégique' },
+  { value: 'Sponsoring', label: 'Sponsoring' },
+  { value: 'Collaboration Institutionnelle', label: 'Collaboration Institutionnelle' },
+];
 
 const Partners = () => {
-  const [formData, setFormData] = useState<PartnershipRequest>({
-    organizationName: '',
-    contactPerson: '',
-    email: '',
-    phone: '',
-    partnershipType: '',
-    message: '',
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [form, setForm] = useState<PartnershipRequest>(EMPTY);
+  const [sent, setSent] = useState(false);
 
   const partners = [
-    {
-      name: 'Partenaire 1',
-      logo: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=400',
-      category: 'strategic' as const,
-    },
-    {
-      name: 'Partenaire 2',
-      logo: 'https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg?auto=compress&cs=tinysrgb&w=400',
-      category: 'sponsor' as const,
-    },
-    {
-      name: 'Partenaire 3',
-      logo: 'https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=400',
-      category: 'institutional' as const,
-    },
+    { name: 'Graphic Téranga', logo: graphicTeranga, category: 'Partenaire stratégique', text: 'Production graphique et audiovisuelle.' },
+    { name: 'Kids Shop', logo: kids, category: 'Partenaire stratégique', text: 'Commerce et distribution.' },
   ];
 
   const benefits = [
-    {
-      icon: Award,
-      title: 'Visibilité Accrue',
-      description: 'Exposition de votre marque auprès d\'une communauté d\'étudiants d\'élite',
-    },
-    {
-      icon: Users,
-      title: 'Accès aux Talents',
-      description: 'Recrutement privilégié parmi nos membres qualifiés et ambitieux',
-    },
-    {
-      icon: Handshake,
-      title: 'Impact Social',
-      description: 'Contribution directe au développement communautaire de Mandégane',
-    },
-    {
-      icon: Building2,
-      title: 'RSE & Engagement',
-      description: 'Renforcement de votre responsabilité sociétale d\'entreprise',
-    },
+    { icon: Award, title: 'Visibilité accrue', text: 'Exposition de votre marque auprès d’une communauté d’étudiants d’élite.' },
+    { icon: Users, title: 'Accès aux talents', text: 'Recrutement privilégié parmi nos membres qualifiés et ambitieux.' },
+    { icon: Handshake, title: 'Impact social', text: 'Contribution directe au développement communautaire de Mandégane.' },
+    { icon: Building2, title: 'RSE & engagement', text: 'Renforcement de votre responsabilité sociétale d’entreprise.' },
   ];
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const tiers = [
+    { name: 'Stratégique', text: 'Une alliance durable, co-construite autour de projets structurants et d’objectifs partagés.' },
+    { name: 'Sponsor', text: 'Associez votre marque à nos événements phares, du Dîner de Gala à la Caravane Médicale.' },
+    { name: 'Institutionnel', text: 'Collaborations avec universités, collectivités et organismes publics ou associatifs.' },
+  ];
+
+  const onChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  const body = () =>
+    [
+      'Demande de partenariat',
+      '',
+      `Organisation : ${form.organizationName}`,
+      `Personne de contact : ${form.contactPerson}`,
+      `Email : ${form.email}`,
+      `Téléphone : ${form.phone}`,
+      `Type de partenariat : ${form.partnershipType}`,
+      '',
+      form.message,
+    ].join('\n');
+
+  const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    setSubmitSuccess(true);
-    setIsSubmitting(false);
-
-    setFormData({
-      organizationName: '',
-      contactPerson: '',
-      email: '',
-      phone: '',
-      partnershipType: '',
-      message: '',
-    });
-
-    setTimeout(() => setSubmitSuccess(false), 5000);
+    window.open(whatsappHref(CONTACT.whatsappPartner, body()), '_blank');
+    setSent(true);
+    setForm(EMPTY);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const sendByEmail = () => {
+    window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(
+      `Partenariat · ${form.organizationName || 'Nouvelle demande'}`,
+    )}&body=${encodeURIComponent(body())}`;
   };
 
   return (
-    <div className="bg-white">
-      {/* Hero Section */}
-     <section className="bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 text-white py-32 relative overflow-hidden">
-  {/* Halo lumineux animé à gauche */}
-  <div className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-[150px] animate-pulse mix-blend-overlay"></div>
-  {/* Halo lumineux animé à droite */}
-  <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-emerald-400/30 rounded-full blur-[130px] animate-pulse mix-blend-overlay"></div>
-  {/* Particules animées subtiles */}
-  <div className="absolute inset-0 pointer-events-none">
-    {[...Array(10)].map((_, i) => (
-      <div
-        key={i}
-        className={`absolute w-2 h-2 bg-white/30 rounded-full animate-[float_6s_ease-in-out_infinite]`}
-        style={{
-          top: `${Math.random() * 100}%`,
-          left: `${Math.random() * 100}%`,
-          animationDelay: `${Math.random() * 3}s`,
-        }}
-      ></div>
-    ))}
-  </div>
-
-  <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
-    <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-tight drop-shadow-lg animate-fadeInUp">
-      Nos Partenaires
-    </h1>
-    <p className="mt-6 text-lg sm:text-xl md:text-2xl text-emerald-200 max-w-3xl mx-auto leading-relaxed animate-fadeInUp delay-200">
-      Ensemble pour l'excellence académique et le développement communautaire
-    </p>
-
-    <div className="mt-12 flex justify-center gap-4 flex-wrap animate-fadeInUp delay-400">
-      <span className="px-4 py-2 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full text-sm font-semibold shadow-lg hover:scale-105 transition-transform duration-300 cursor-default">
-        Stratégique
-      </span>
-      <span className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-700 rounded-full text-sm font-semibold shadow-lg hover:scale-105 transition-transform duration-300 cursor-default">
-        Sponsor
-      </span>
-      <span className="px-4 py-2 bg-gradient-to-r from-emerald-300 to-emerald-500 rounded-full text-sm font-semibold shadow-lg hover:scale-105 transition-transform duration-300 cursor-default">
-        Institutionnel
-      </span>
-    </div>
-  </div>
-
-  {/* Animations CSS */}
-  <style jsx>{`
-    @keyframes float {
-      0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
-      50% { transform: translateY(-20px) translateX(10px); opacity: 0.6; }
-    }
-
-    .animate-fadeInUp {
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInUp 1s forwards;
-    }
-
-    .animate-fadeInUp.delay-200 {
-      animation-delay: 0.2s;
-    }
-
-    .animate-fadeInUp.delay-400 {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  `}</style>
-</section>
-
-
-      {/* Partners Grid */}
-      <section className="py-24 max-w-7xl mx-auto px-6 relative overflow-hidden">
-  {/* Particules animées premium */}
-  <div className="absolute inset-0 pointer-events-none">
-    {[...Array(8)].map((_, i) => (
-      <div
-        key={i}
-        className="absolute w-2 h-2 bg-white/20 rounded-full animate-[float_6s_ease-in-out_infinite]"
-        style={{
-          top: `${Math.random() * 100}%`,
-          left: `${Math.random() * 100}%`,
-          animationDelay: `${Math.random() * 3}s`,
-        }}
-      />
-    ))}
-  </div>
-
-  <div className="text-center mb-16 relative z-10">
-    <SectionHeader
-      title="Ils Nous Font Confiance"
-      centered
-    />
-  </div>
-
-  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-12 relative z-10">
-    {partners.map((partner, i) => (
-      <div
-        key={i}
-        className="relative bg-white rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_35px_60px_rgba(0,128,0,0.35)] transition-all duration-500 hover:-translate-y-3"
+    <div className="bg-ivory-50">
+      <PageHero
+        image={galaTeam}
+        crumbs={[{ label: 'Partenaires' }]}
+        eyebrow="Stratégique · Sponsor · Institutionnel"
+        lines={['Nos', <span className="text-gold-gradient">Partenaires.</span>]}
+        intro="Ensemble pour l’excellence académique et le développement communautaire."
       >
-        {/* Halo lumineux animé derrière la carte */}
-        <div className="absolute -inset-3 bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-600 rounded-3xl blur-3xl opacity-30 pointer-events-none animate-pulse"></div>
+        <LuxButton href="#demande">Devenir partenaire</LuxButton>
+      </PageHero>
 
-        <div className="relative p-6 flex flex-col items-center">
-          {/* Logo / Image */}
-          <div className="aspect-video w-full max-h-40 overflow-hidden rounded-xl mb-6 transition-transform duration-1000 hover:scale-105">
-            <img
-              src={partner.logo}
-              alt={partner.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Nom du partenaire */}
-          <h3 className="text-lg md:text-xl font-bold text-emerald-900 text-center mb-2 transition-transform duration-500 group-hover:scale-105">
-            {partner.name}
-          </h3>
-
-          {/* Badge premium */}
-          <span className="inline-block mt-2 px-4 py-1 text-sm font-semibold bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600 text-white rounded-full shadow-lg transition-all duration-500 hover:scale-105">
-            {partner.category.charAt(0).toUpperCase() + partner.category.slice(1)}
-          </span>
+      {/* Ils nous font confiance */}
+      <section className="container-lux py-28 sm:py-36">
+        <SectionTitle eyebrow="Ils nous font confiance" lines={['Des alliés', <span className="text-gold-700">de premier rang.</span>]} />
+        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {partners.map((p, i) => (
+            <Reveal key={p.name} delay={i * 0.1} className="group border border-ink-900/10 bg-ivory-100 p-8 transition-colors duration-700 hover:border-gold-500">
+              <div className="aspect-[16/10] overflow-hidden rounded-sm bg-ivory-50">
+                <img
+                  src={p.logo}
+                  alt={p.name}
+                  className="h-full w-full object-cover transition-transform duration-[1400ms] ease-lux group-hover:scale-105"
+                />
+              </div>
+              <p className="mt-7 text-[10px] font-semibold uppercase tracking-[0.28em] text-gold-700">{p.category}</p>
+              <h3 className="mt-2 font-display text-3xl font-semibold text-ink-950">{p.name}</h3>
+              <p className="mt-2 text-sm text-ink-900/60">{p.text}</p>
+            </Reveal>
+          ))}
+          <Reveal delay={0.2}>
+            <a
+              href="#demande"
+              className="group flex h-full min-h-[320px] flex-col items-center justify-center border border-dashed border-ink-900/25 p-8 text-center transition-colors duration-500 hover:border-gold-500 hover:bg-ink-950"
+            >
+              <span className="flex h-16 w-16 items-center justify-center rounded-full border border-ink-900/20 text-ink-950 transition-all duration-500 group-hover:rotate-90 group-hover:border-gold-500 group-hover:text-gold-400">
+                <Plus className="h-6 w-6" />
+              </span>
+              <p className="mt-6 font-display text-3xl text-ink-950 transition-colors duration-500 group-hover:text-ivory-50">
+                Votre organisation ici
+              </p>
+              <p className="mt-2 text-sm text-ink-900/55 transition-colors duration-500 group-hover:text-ivory-100/60">
+                Rejoignez notre écosystème de partenaires.
+              </p>
+            </a>
+          </Reveal>
         </div>
-      </div>
-    ))}
-  </div>
+      </section>
 
-  {/* Animations CSS */}
-  <style jsx>{`
-    @keyframes float {
-      0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
-      50% { transform: translateY(-15px) translateX(8px); opacity: 0.6; }
-    }
-  `}</style>
-</section>
-
-
-      {/* Benefits */}
-      <section className="py-20 bg-emerald-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-emerald-900 mb-4">
-              Pourquoi Devenir Partenaire ?
-            </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Un partenariat avec l'AEEOM vous offre des opportunités uniques de collaboration et d'impact
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {benefits.map((benefit, i) => {
-              const Icon = benefit.icon;
+      {/* Pourquoi */}
+      <section className="grain relative overflow-hidden bg-ink-950 py-28 text-ivory-50 sm:py-36">
+        <div className="container-lux relative z-10">
+          <SectionTitle
+            dark
+            eyebrow="Pourquoi devenir partenaire"
+            lines={['Une alliance', <span className="text-gold-gradient">qui a du sens.</span>]}
+            text="Un partenariat avec l’AEEOM vous offre des opportunités uniques de collaboration et d’impact."
+          />
+          <div className="mt-16 grid gap-px overflow-hidden border border-ivory-50/10 bg-ivory-50/10 sm:grid-cols-2 lg:grid-cols-4">
+            {benefits.map((b, i) => {
+              const Icon = b.icon;
               return (
-                <div
-                  key={i}
-                  className="bg-white rounded-2xl p-6 text-center shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
-                >
-                  <div className="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Icon className="w-7 h-7 text-emerald-900" />
-                  </div>
-                  <h3 className="text-lg font-bold text-emerald-900 mb-2">{benefit.title}</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">{benefit.description}</p>
-                </div>
+                <Reveal key={b.title} delay={i * 0.08} className="group bg-ink-950 p-10 transition-colors duration-700 hover:bg-ink-800">
+                  <Icon className="h-6 w-6 text-gold-400" />
+                  <h3 className="mt-12 font-display text-3xl">{b.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-ivory-100/60">{b.text}</p>
+                </Reveal>
               );
             })}
+          </div>
+
+          <div className="mt-24 grid gap-10 md:grid-cols-3">
+            {tiers.map((t, i) => (
+              <Reveal key={t.name} delay={i * 0.1} className="border-t border-gold-500/40 pt-8">
+                <p className="text-[11px] font-semibold tracking-[0.2em] text-gold-500">{String(i + 1).padStart(2, '0')}</p>
+                <h3 className="mt-4 font-display text-4xl">{t.name}</h3>
+                <p className="mt-3 leading-relaxed text-ivory-100/60">{t.text}</p>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Partnership Form */}
-     <section className="py-20 bg-gray-50">
-  <div className="max-w-3xl mx-auto px-6">
-    <div className="text-center mb-12">
-      <SectionHeader
-        title="Demande de Partenariat"
-        subtitle="Rejoignez notre écosystème de partenaires stratégiques"
-        centered
-      />
-    </div>
-
-    {submitSuccess && (
-      <div className="mb-8 p-4 bg-emerald-50 border border-emerald-200 rounded-lg flex items-start space-x-3">
-        <CheckCircle className="w-6 h-6 text-emerald-700 flex-shrink-0 mt-0.5" />
-        <div>
-          <h4 className="font-semibold text-emerald-900 mb-1">Demande envoyée avec succès !</h4>
-          <p className="text-sm text-emerald-700">
-            Nous vous contacterons dans les plus brefs délais pour discuter des modalités de partenariat.
-          </p>
+      {/* Formulaire */}
+      <section id="demande" className="container-lux scroll-mt-24 py-28 sm:py-36">
+        <div className="grid gap-16 lg:grid-cols-12">
+          <div className="lg:col-span-4">
+            <Reveal>
+              <span className="eyebrow text-gold-700">Demande de partenariat</span>
+            </Reveal>
+            <RevealLines
+              lines={['Construisons', <span className="text-gold-700">ensemble.</span>]}
+              className="h-display mt-6 text-4xl text-ink-950 sm:text-5xl"
+            />
+            <Reveal delay={0.15}>
+              <p className="mt-6 leading-relaxed text-ink-900/60">
+                Rejoignez notre écosystème de partenaires stratégiques. Nous revenons vers vous dans les plus brefs
+                délais pour discuter des modalités.
+              </p>
+            </Reveal>
+          </div>
+          <Reveal delay={0.1} className="lg:col-span-7 lg:col-start-6">
+            <form onSubmit={onSubmit} className="space-y-8">
+              <div className="grid gap-8 sm:grid-cols-2">
+                <Field name="organizationName" label="Organisation" value={form.organizationName} onChange={onChange} />
+                <Field name="contactPerson" label="Personne de contact" value={form.contactPerson} onChange={onChange} />
+              </div>
+              <div className="grid gap-8 sm:grid-cols-2">
+                <Field name="email" type="email" label="Email" value={form.email} onChange={onChange} />
+                <Field name="phone" type="tel" label="Téléphone" value={form.phone} onChange={onChange} />
+              </div>
+              <Field name="partnershipType" label="Type de partenariat" value={form.partnershipType} onChange={onChange} options={TYPES} />
+              <Field name="message" label="Décrivez votre projet de partenariat" value={form.message} onChange={onChange} textarea />
+              <div className="flex flex-wrap items-center gap-6 pt-4">
+                <LuxButton type="submit" variant="dark">
+                  Envoyer via WhatsApp
+                </LuxButton>
+                <button
+                  type="button"
+                  onClick={sendByEmail}
+                  className="link-lux text-xs font-semibold uppercase tracking-[0.22em] text-ink-950"
+                >
+                  Envoyer par email
+                </button>
+              </div>
+              {sent && (
+                <p className="border-l-2 border-gold-500 pl-4 text-sm text-ink-900/70">
+                  Merci ! WhatsApp s’est ouvert avec votre demande préremplie. Nous vous recontactons très vite.
+                </p>
+              )}
+            </form>
+          </Reveal>
         </div>
-      </div>
-    )}
-
-    <form
-      onSubmit={handleSubmit}
-      className="relative bg-white rounded-3xl border border-gray-200 p-8 space-y-6 shadow-2xl hover:shadow-[0_30px_50px_rgba(0,128,0,0.2)] transition-all duration-500"
-    >
-      {/* Halo lumineux derrière le formulaire */}
-      <div className="absolute -inset-2 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-3xl blur-3xl opacity-20 pointer-events-none"></div>
-
-      <div className="grid sm:grid-cols-2 gap-6 relative z-10">
-        <div>
-          <label htmlFor="organizationName" className="block text-sm font-medium text-gray-700 mb-2">
-            Nom de l'Organisation *
-          </label>
-          <input
-            type="text"
-            id="organizationName"
-            name="organizationName"
-            value={formData.organizationName}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-          />
-        </div>
-        <div>
-          <label htmlFor="contactPerson" className="block text-sm font-medium text-gray-700 mb-2">
-            Personne de Contact *
-          </label>
-          <input
-            type="text"
-            id="contactPerson"
-            name="contactPerson"
-            value={formData.contactPerson}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-          />
-        </div>
-      </div>
-
-      <div className="grid sm:grid-cols-2 gap-6 relative z-10">
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-            Email *
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-          />
-        </div>
-        <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-            Téléphone *
-          </label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-          />
-        </div>
-      </div>
-
-      <div className="relative z-10">
-        <label htmlFor="partnershipType" className="block text-sm font-medium text-gray-700 mb-2">
-          Type de Partenariat *
-        </label>
-        <select
-          id="partnershipType"
-          name="partnershipType"
-          value={formData.partnershipType}
-          onChange={handleChange}
-          required
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-        >
-          <option value="">Sélectionnez un type</option>
-          <option value="strategic">Partenariat Stratégique</option>
-          <option value="sponsor">Sponsoring</option>
-          <option value="institutional">Collaboration Institutionnelle</option>
-        </select>
-      </div>
-
-      <div className="relative z-10">
-        <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-          Message *
-        </label>
-        <textarea
-          id="message"
-          name="message"
-          value={formData.message}
-          onChange={handleChange}
-          required
-          rows={6}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
-          placeholder="Décrivez votre projet de partenariat..."
-        />
-      </div>
-
-      {/* Boutons d'action */}
-      <div className="flex flex-col sm:flex-row gap-4 relative z-10">
-        {/* Bouton WhatsApp */}
-        <button
-          type="button"
-          onClick={() => {
-            const whatsappNumber = '221784785795';
-            const whatsappMessage = `
-Nom de l'Organisation: ${formData.organizationName}
-Personne de Contact: ${formData.contactPerson}
-Email: ${formData.email}
-Téléphone: ${formData.phone}
-Type de Partenariat: ${formData.partnershipType}
-Message: ${formData.message}
-            `.trim();
-            const encodedMessage = encodeURIComponent(whatsappMessage);
-            window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
-            setSubmitSuccess(true);
-
-            // Réinitialisation
-            setFormData({
-              organizationName: '',
-              contactPerson: '',
-              email: '',
-              phone: '',
-              partnershipType: '',
-              message: '',
-            });
-
-            setTimeout(() => setSubmitSuccess(false), 5000);
-          }}
-          className="flex-1 py-3 px-6 bg-gradient-to-r from-emerald-900 to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:scale-[1.05] hover:shadow-2xl transition-all duration-300 text-center"
-        >
-          Envoyer via WhatsApp
-        </button>
-
-        {/* Bouton Email classique */}
-        <Button
-          type="submit"
-          size="lg"
-          className="flex-1"
-          disabled={isSubmitting}
-          icon={isSubmitting ? undefined : ArrowRight}
-        >
-          {isSubmitting ? 'Envoi en cours...' : 'Envoyer par Email'}
-        </Button>
-      </div>
-    </form>
-  </div>
-</section>
-
+      </section>
     </div>
   );
 };

@@ -43,6 +43,8 @@ export interface ContactMessage {
   email: string;
   subject: string;
   message: string;
+  phone?: string;
+  address?: string;
 }
 
 export interface PartnershipRequest {
