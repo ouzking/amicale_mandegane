@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, animate, motion } from 'framer-motion';
 import logo from '../../assets/LOGO.jpeg';
 import { EASE } from '../ui/Reveal';
+import { useT } from '../../i18n/context';
 
 const KEY = 'aeeom-intro-seen';
 
@@ -15,6 +16,7 @@ const alreadySeen = () => {
 
 /** Écran d'introduction, joué une fois par session. */
 const Preloader = () => {
+  const t = useT();
   const [visible, setVisible] = useState(() => !alreadySeen());
   const [count, setCount] = useState(0);
 
@@ -69,7 +71,7 @@ const Preloader = () => {
             transition={{ delay: 0.6, duration: 1 }}
             className="mt-3 text-[10px] font-semibold uppercase tracking-[0.5em] text-gold-400"
           >
-            S’associer pour mieux servir l’avenir
+            {t({ fr: 'S’associer pour mieux servir l’avenir', en: 'Uniting to better serve the future', wo: 'Booloo ngir gëna jariñ ëllëg' })}
           </motion.p>
 
           <div className="absolute bottom-10 left-1/2 w-[min(320px,70vw)] -translate-x-1/2">

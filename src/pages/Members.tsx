@@ -10,6 +10,8 @@ import PageHero from '../components/ui/PageHero';
 import { EASE, Reveal } from '../components/ui/Reveal';
 import LuxButton from '../components/ui/LuxButton';
 import { lockScroll } from '../lib/smooth';
+import { useT } from '../i18n/context';
+import { positionTr, roleTr } from '../i18n/positions';
 
 type Instance = 'all' | 'bureau' | 'commissions' | 'membres';
 
@@ -19,15 +21,12 @@ const instanceOf = (m: Member): Exclude<Instance, 'all'> => {
   return 'commissions';
 };
 
-const displayPosition = (m: Member) => (m.position === 'Membre Simple' ? 'Membre' : m.position);
-
-const memberWhatsapp = (m: Member) =>
-  `https://wa.me/221${m.phone?.replace(/\D/g, '')}?text=${encodeURIComponent(
-    `Bonjour ${m.fullName}, je vous contacte via le site officiel de l'AEEOM.`,
-  )}`;
+const memberWhatsapp = (m: Member, greeting: string) =>
+  `https://wa.me/221${m.phone?.replace(/\D/g, '')}?text=${encodeURIComponent(`${greeting} ${m.fullName}`)}`;
 
 /* ============ Fiche membre ============ */
 const MemberModal = ({ member, onClose }: { member: Member | null; onClose: () => void }) => {
+  const t = useT();
   useEffect(() => {
     if (!member) return;
     lockScroll(true);
@@ -63,7 +62,7 @@ const MemberModal = ({ member, onClose }: { member: Member | null; onClose: () =
           >
             <button
               onClick={onClose}
-              aria-label="Fermer"
+              aria-label={t({ fr: 'Fermer', en: 'Close', wo: 'Tëj' })}
               className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-ink-950 text-ivory-50 transition-colors hover:bg-gold-500 hover:text-ink-950"
             >
               <X className="h-5 w-5" />
@@ -77,19 +76,30 @@ const MemberModal = ({ member, onClose }: { member: Member | null; onClose: () =
             </div>
             <div className="flex flex-col p-8 sm:p-12 md:col-span-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-gold-700">
-                Section {member.section === 'dakar' ? 'Dakar' : 'Ziguinchor'} · {member.role}
+                {t({ fr: 'Section', en: 'Section', wo: 'Pàcc' })} {member.section === 'dakar' ? 'Dakar' : 'Ziguinchor'} · {t(roleTr(member.role))}
               </p>
               <h2 className="mt-4 font-display text-5xl font-medium leading-none text-ink-950">{member.fullName}</h2>
-              <p className="mt-3 font-display text-2xl text-gold-700">{displayPosition(member)}</p>
+              <p className="mt-3 font-display text-2xl text-gold-700">{t(positionTr(member.position))}</p>
               <div className="hairline my-8" />
-              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-900/45">Expertise</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-900/45">
+                {t({ fr: 'Expertise', en: 'Expertise', wo: 'Xam-xam' })}
+              </p>
               <p className="mt-2 text-ink-950">{member.expertise}</p>
-              <p className="mt-8 text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-900/45">Parcours</p>
+              <p className="mt-8 text-[10px] font-semibold uppercase tracking-[0.3em] text-ink-900/45">
+                {t({ fr: 'Parcours', en: 'Background', wo: 'Yoonam' })}
+              </p>
               <p className="mt-2 leading-relaxed text-ink-900/70">{member.bio}</p>
               <div className="mt-auto flex flex-wrap gap-3 pt-10">
                 {member.phone && (
                   <a
-                    href={memberWhatsapp(member)}
+                    href={memberWhatsapp(
+                      member,
+                      t({
+                        fr: 'Bonjour, je vous contacte via le site officiel de l’AEEOM.',
+                        en: 'Hello, I am contacting you through the official AEEOM website.',
+                        wo: 'Asalaa maalekum, maa ngi lay jokkoo jaare ko ci site bu AEEOM.',
+                      }),
+                    )}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-3 rounded-full bg-ink-950 px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.18em] text-ivory-50 transition-colors duration-500 hover:bg-gold-500 hover:text-ink-950"
@@ -119,6 +129,7 @@ const MemberModal = ({ member, onClose }: { member: Member | null; onClose: () =
 // noir & blanc teinté vert sur les écrans à souris ([@media(hover:hover)]), couleur révélée au survol.
 
 const MemberCard = ({ member, index, onOpen }: { member: Member; index: number; onOpen: (m: Member) => void }) => {
+  const t = useT();
   const rx = useMotionValue(0);
   const ry = useMotionValue(0);
   const gx = useMotionValue(50);
@@ -151,7 +162,7 @@ const MemberCard = ({ member, index, onOpen }: { member: Member; index: number; 
       transition={{ duration: 0.8, ease: EASE, delay: Math.min(index % 8, 7) * 0.05 }}
       onClick={() => onOpen(member)}
       className="group text-left [perspective:1100px]"
-      aria-label={`Voir le profil de ${member.fullName}`}
+      aria-label={`${t({ fr: 'Voir le profil de', en: 'View the profile of', wo: 'Xool profil bu' })} ${member.fullName}`}
     >
       <div className="relative">
         {/* Cadre doré décalé */}
@@ -181,7 +192,7 @@ const MemberCard = ({ member, index, onOpen }: { member: Member; index: number; 
           </span>
           {instanceOf(member) === 'bureau' && (
             <span className="absolute right-3 top-3 rounded-full border border-gold-400/60 bg-ink-950/40 px-3 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-gold-300 backdrop-blur">
-              Bureau
+              {t({ fr: 'Bureau', en: 'Board', wo: 'Biro' })}
             </span>
           )}
 
@@ -189,10 +200,12 @@ const MemberCard = ({ member, index, onOpen }: { member: Member; index: number; 
           <div
             className={`absolute inset-x-0 bottom-0 hidden translate-y-full bg-gradient-to-t from-ink-950 via-ink-950/90 to-transparent p-5 pt-16 transition-transform duration-700 ease-lux group-hover:translate-y-0 [@media(hover:hover)]:block`}
           >
-            <p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-gold-400">Expertise</p>
+            <p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-gold-400">
+              {t({ fr: 'Expertise', en: 'Expertise', wo: 'Xam-xam' })}
+            </p>
             <p className="mt-1.5 line-clamp-2 text-sm leading-snug text-ivory-100">{member.expertise}</p>
             <span className="mt-4 inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-gold-300">
-              Voir le profil <ArrowUpRight className="h-3.5 w-3.5" />
+              {t({ fr: 'Voir le profil', en: 'View profile', wo: 'Xool profil bi' })} <ArrowUpRight className="h-3.5 w-3.5" />
             </span>
           </div>
 
@@ -204,7 +217,7 @@ const MemberCard = ({ member, index, onOpen }: { member: Member; index: number; 
         </motion.div>
       </div>
 
-      <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.22em] text-gold-700">{displayPosition(member)}</p>
+      <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.22em] text-gold-700">{t(positionTr(member.position))}</p>
       <h3 className="mt-1 font-display text-xl leading-tight text-ink-950 sm:text-2xl">{member.fullName}</h3>
       <span className="mt-3 block h-px w-8 bg-gold-500 transition-all duration-700 ease-lux group-hover:w-full" />
       <p className={`mt-3 line-clamp-1 text-xs text-ink-900/55 sm:text-sm [@media(hover:hover)]:hidden`}>{member.expertise}</p>
@@ -223,7 +236,9 @@ const MemberGrid = ({ list, offset, onOpen }: { list: Member[]; offset: number; 
 );
 
 /* ============ Présidence ============ */
-const PresidentSpotlight = ({ member, onOpen }: { member: Member; onOpen: (m: Member) => void }) => (
+const PresidentSpotlight = ({ member, onOpen }: { member: Member; onOpen: (m: Member) => void }) => {
+  const t = useT();
+  return (
   <Reveal className="mb-28">
     <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
       <div className="relative mx-auto w-full max-w-md lg:col-span-5 lg:max-w-none">
@@ -239,28 +254,30 @@ const PresidentSpotlight = ({ member, onOpen }: { member: Member; onOpen: (m: Me
         </button>
       </div>
       <div className="lg:col-span-7">
-        <span className="eyebrow text-gold-700">La Présidence</span>
+        <span className="eyebrow text-gold-700">{t({ fr: 'La Présidence', en: 'The Presidency', wo: 'Njiitu mbootaay gi' })}</span>
         <h2 className="h-display mt-6 text-[2.6rem] text-ink-950 sm:text-6xl lg:text-[4.2rem]">{member.fullName}</h2>
         <p className="mt-3 font-display text-2xl text-gold-700">
-          {member.position} · Section {member.section === 'dakar' ? 'Dakar' : 'Ziguinchor'}
+          {t(positionTr(member.position))} · {t({ fr: 'Section', en: 'Section', wo: 'Pàcc' })} {member.section === 'dakar' ? 'Dakar' : 'Ziguinchor'}
         </p>
         <div className="hairline my-8" />
         <p className="max-w-2xl text-lg leading-relaxed text-ink-900/70">{member.bio}</p>
         <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-900/45">
-          Expertise · <span className="text-ink-950">{member.expertise}</span>
+          {t({ fr: 'Expertise', en: 'Expertise', wo: 'Xam-xam' })} · <span className="text-ink-950">{member.expertise}</span>
         </p>
         <div className="mt-10">
           <LuxButton onClick={() => onOpen(member)} variant="dark">
-            Voir le profil
+            {t({ fr: 'Voir le profil', en: 'View profile', wo: 'Xool profil bi' })}
           </LuxButton>
         </div>
       </div>
     </div>
   </Reveal>
-);
+  );
+};
 
 /* ============ Page ============ */
 const Members = () => {
+  const t = useT();
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState('');
   const [instance, setInstance] = useState<Instance>('all');
@@ -291,9 +308,21 @@ const Members = () => {
   const groups = useMemo(() => {
     const rest = filtered.filter((m) => m !== president);
     const defs = [
-      { key: 'bureau', eyebrow: 'Gouvernance', title: 'Bureau exécutif' },
-      { key: 'commissions', eyebrow: 'Pôles d’action', title: 'Commissions thématiques' },
-      { key: 'membres', eyebrow: 'La communauté', title: 'Membres' },
+      {
+        key: 'bureau',
+        eyebrow: { fr: 'Gouvernance', en: 'Governance', wo: 'Njiitlu' },
+        title: { fr: 'Bureau exécutif', en: 'Executive board', wo: 'Biro bi' },
+      },
+      {
+        key: 'commissions',
+        eyebrow: { fr: 'Pôles d’action', en: 'Action areas', wo: 'Wàlli jëf' },
+        title: { fr: 'Commissions thématiques', en: 'Thematic committees', wo: 'Kurél yi' },
+      },
+      {
+        key: 'membres',
+        eyebrow: { fr: 'La communauté', en: 'The community', wo: 'Askan wi' },
+        title: { fr: 'Membres', en: 'Members', wo: 'Way-bokk' },
+      },
     ] as const;
     let offset = president ? 1 : 0;
     return defs
@@ -315,14 +344,23 @@ const Members = () => {
     <div className="bg-ivory-50">
       <PageHero
         image={groupe}
-        crumbs={[{ label: 'Membres' }]}
-        eyebrow="Communauté d’excellence"
-        lines={['Répertoire des', <span className="text-gold-gradient">Membres.</span>]}
-        intro="Découvrez les talents, les parcours et les expertises qui composent notre réseau d’exception. Une communauté engagée, ambitieuse et tournée vers l’impact."
+        crumbs={[{ label: t({ fr: 'Membres', en: 'Members', wo: 'Way-bokk' }) }]}
+        eyebrow={t({ fr: 'Communauté d’excellence', en: 'A community of excellence', wo: 'Askanu xarañ' })}
+        lines={[
+          t({ fr: 'Répertoire des', en: 'Directory of', wo: 'Limu' }),
+          <span className="text-gold-gradient">{t({ fr: 'Membres.', en: 'Members.', wo: 'Way-bokk yi.' })}</span>,
+        ]}
+        intro={t({
+          fr: 'Découvrez les talents, les parcours et les expertises qui composent notre réseau d’exception. Une communauté engagée, ambitieuse et tournée vers l’impact.',
+          en: 'Discover the talents, backgrounds and expertise that make up our exceptional network. A committed, ambitious community focused on impact.',
+          wo: 'Xamal mën-mën yi, yoon yi ak xam-xam yi nekk ci sunu mbooloo bu amul moroom. Askan wu am yéene te jëm ci njeexital.',
+        })}
         aside={
           <div className="text-right">
             <p className="font-display text-7xl text-gold-300">{members.length}</p>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-ivory-100/60">profils publiés</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-ivory-100/60">
+              {t({ fr: 'profils publiés', en: 'published profiles', wo: 'profil yu ñu siiwal' })}
+            </p>
           </div>
         }
       />
@@ -336,13 +374,17 @@ const Members = () => {
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Rechercher un nom, un poste, une expertise"
+              placeholder={t({
+                fr: 'Rechercher un nom, un poste, une expertise',
+                en: 'Search a name, role or expertise',
+                wo: 'Seet ab tur, ab palaas walla ab xam-xam',
+              })}
               className="w-full border-0 border-b border-ink-900/15 bg-transparent py-3 pl-8 pr-2 text-sm text-ink-950 placeholder:text-ink-900/40 focus:border-gold-600 focus:outline-none focus:ring-0"
             />
           </div>
           <div className="-mx-1 flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {[
-              { v: 'all', l: 'Toutes sections' },
+              { v: 'all', l: t({ fr: 'Toutes sections', en: 'All sections', wo: 'Pàcc yépp' }) },
               { v: 'dakar', l: 'Dakar' },
               { v: 'ziguinchor', l: 'Ziguinchor' },
             ].map((s) => (
@@ -353,10 +395,10 @@ const Members = () => {
             <span className="mx-2 my-2 w-px shrink-0 bg-ink-900/15" />
             {(
               [
-                { v: 'all', l: 'Tous' },
-                { v: 'bureau', l: 'Bureau' },
-                { v: 'commissions', l: 'Commissions' },
-                { v: 'membres', l: 'Membres' },
+                { v: 'all', l: t({ fr: 'Tous', en: 'All', wo: 'Ñépp' }) },
+                { v: 'bureau', l: t({ fr: 'Bureau', en: 'Board', wo: 'Biro' }) },
+                { v: 'commissions', l: t({ fr: 'Commissions', en: 'Committees', wo: 'Kurél' }) },
+                { v: 'membres', l: t({ fr: 'Membres', en: 'Members', wo: 'Way-bokk' }) },
               ] as { v: Instance; l: string }[]
             ).map((s) => (
               <button key={s.v} onClick={() => setInstance(s.v)} className={`shrink-0 ${chip(instance === s.v)}`}>
@@ -370,18 +412,31 @@ const Members = () => {
       {/* Grille */}
       <section className="container-lux min-h-[60vh] py-16 sm:py-24">
         <p className="mb-10 text-[11px] font-semibold uppercase tracking-[0.3em] text-ink-900/45">
-          {filtered.length} {filtered.length > 1 ? 'profils' : 'profil'}
+          {filtered.length}{' '}
+          {filtered.length > 1
+            ? t({ fr: 'profils', en: 'profiles', wo: 'profil' })
+            : t({ fr: 'profil', en: 'profile', wo: 'profil' })}
         </p>
 
         {grouped && president && <PresidentSpotlight member={president} onOpen={setSelected} />}
 
         {filtered.length === 0 ? (
           <div className="border border-dashed border-ink-900/20 px-8 py-24 text-center">
-            <p className="font-display text-4xl text-ink-950">Aucun profil ne correspond.</p>
+            <p className="font-display text-4xl text-ink-950">
+              {t({ fr: 'Aucun profil ne correspond.', en: 'No matching profile.', wo: 'Amul profil bu ci dëppoo.' })}
+            </p>
             <p className="mt-3 text-ink-900/60">
               {section === 'ziguinchor'
-                ? 'Les profils de la Section Ziguinchor seront publiés prochainement.'
-                : 'Essayez un autre mot-clé ou réinitialisez les filtres.'}
+                ? t({
+                    fr: 'Les profils de la Section Ziguinchor seront publiés prochainement.',
+                    en: 'Ziguinchor Section profiles will be published soon.',
+                    wo: 'Dinañu siiwal ci lu gaaw profil yu Pàccu Ziguinchor.',
+                  })
+                : t({
+                    fr: 'Essayez un autre mot-clé ou réinitialisez les filtres.',
+                    en: 'Try another keyword or reset the filters.',
+                    wo: 'Jéemal beneen baat walla nga delloo filtre yi.',
+                  })}
             </p>
             <button
               onClick={() => {
@@ -391,7 +446,7 @@ const Members = () => {
               }}
               className="link-lux mt-8 text-xs font-semibold uppercase tracking-[0.22em] text-gold-700"
             >
-              Réinitialiser les filtres
+              {t({ fr: 'Réinitialiser les filtres', en: 'Reset filters', wo: 'Delloo filtre yi' })}
             </button>
           </div>
         ) : grouped ? (
@@ -400,8 +455,8 @@ const Members = () => {
               <div key={g.key}>
                 <div className="mb-12 flex items-end justify-between gap-6 border-b border-ink-900/10 pb-6">
                   <div>
-                    <span className="eyebrow text-gold-700">{g.eyebrow}</span>
-                    <h2 className="mt-4 font-display text-3xl text-ink-950 sm:text-4xl">{g.title}</h2>
+                    <span className="eyebrow text-gold-700">{t(g.eyebrow)}</span>
+                    <h2 className="mt-4 font-display text-3xl text-ink-950 sm:text-4xl">{t(g.title)}</h2>
                   </div>
                   <span className="font-display text-4xl text-gold-500/70 sm:text-5xl">
                     {String(g.list.length).padStart(2, '0')}

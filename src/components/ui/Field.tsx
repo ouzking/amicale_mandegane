@@ -1,4 +1,5 @@
 import type { ChangeEvent } from 'react';
+import { useT } from '../../i18n/context';
 
 interface FieldProps {
   name: string;
@@ -13,6 +14,7 @@ interface FieldProps {
 
 /** Champ de formulaire à libellé flottant. */
 const Field = ({ name, label, value, onChange, type = 'text', required = true, textarea, options }: FieldProps) => {
+  const t = useT();
   const id = `field-${name}`;
   const labelCls =
     'pointer-events-none absolute left-0 top-6 origin-left text-base text-ink-900/50 transition-all duration-300 ease-lux peer-focus:top-0 peer-focus:text-[10px] peer-focus:font-semibold peer-focus:uppercase peer-focus:tracking-[0.25em] peer-focus:text-gold-700 peer-[:not(:placeholder-shown)]:top-0 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:font-semibold peer-[:not(:placeholder-shown)]:uppercase peer-[:not(:placeholder-shown)]:tracking-[0.25em]';
@@ -32,7 +34,7 @@ const Field = ({ name, label, value, onChange, type = 'text', required = true, t
           required={required}
           className="field-lux cursor-pointer appearance-none pt-3"
         >
-          <option value="">Sélectionnez</option>
+          <option value="">{t({ fr: 'Sélectionnez', en: 'Select', wo: 'Tànnal' })}</option>
           {options.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}

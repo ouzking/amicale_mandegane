@@ -6,6 +6,7 @@ import Header from './Header';
 import Footer from './Footer';
 import Preloader from './Preloader';
 import Cursor from './Cursor';
+import ChatWidget from '../chat/ChatWidget';
 import { setLenis } from '../../lib/smooth';
 
 interface LayoutProps {
@@ -45,6 +46,7 @@ const Layout = ({ children }: LayoutProps) => {
       <Header />
       <main className="flex-grow">{children}</main>
       <Footer />
+      <ChatWidget />
     </div>
   );
 };

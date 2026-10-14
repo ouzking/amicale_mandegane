@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { lockScroll } from '../../lib/smooth';
 import type { GalleryImage } from '../../data/site';
 import { EASE } from './Reveal';
+import { useT } from '../../i18n/context';
 
 interface LightboxProps {
   images: GalleryImage[];
@@ -12,6 +13,7 @@ interface LightboxProps {
 }
 
 const Lightbox = ({ images, index, onChange }: LightboxProps) => {
+  const t = useT();
   const open = index !== null;
   const go = useCallback(
     (dir: number) => {
@@ -52,7 +54,7 @@ const Lightbox = ({ images, index, onChange }: LightboxProps) => {
               {String(index + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
             </span>
             <button
-              aria-label="Fermer"
+              aria-label={t({ fr: 'Fermer', en: 'Close', wo: 'Tëj' })}
               className="flex h-12 w-12 items-center justify-center rounded-full border border-ivory-50/20 transition-colors hover:bg-ivory-50 hover:text-ink-950"
               onClick={() => onChange(null)}
             >
@@ -73,11 +75,11 @@ const Lightbox = ({ images, index, onChange }: LightboxProps) => {
               >
                 <img
                   src={images[index].src}
-                  alt={images[index].caption}
+                  alt={t(images[index].caption)}
                   className="max-h-[72vh] w-auto rounded-sm object-contain shadow-2xl"
                 />
                 <figcaption className="mt-5 font-display text-xl text-ivory-100 sm:text-2xl">
-                  {images[index].caption}
+                  {t(images[index].caption)}
                 </figcaption>
               </motion.figure>
             </AnimatePresence>
@@ -85,7 +87,7 @@ const Lightbox = ({ images, index, onChange }: LightboxProps) => {
             {images.length > 1 && (
               <>
                 <button
-                  aria-label="Précédente"
+                  aria-label={t({ fr: 'Précédente', en: 'Previous', wo: 'Ginnaaw' })}
                   onClick={(e) => {
                     e.stopPropagation();
                     go(-1);
@@ -95,7 +97,7 @@ const Lightbox = ({ images, index, onChange }: LightboxProps) => {
                   <ChevronLeft className="h-5 w-5" />
                 </button>
                 <button
-                  aria-label="Suivante"
+                  aria-label={t({ fr: 'Suivante', en: 'Next', wo: 'Topp' })}
                   onClick={(e) => {
                     e.stopPropagation();
                     go(1);

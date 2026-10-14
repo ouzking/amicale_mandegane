@@ -2,13 +2,17 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowUpRight, Check, Plus } from 'lucide-react';
 import { events, getEvent, MONTHS, statusLabel } from '../../data/events';
+import { useT } from '../../i18n/context';
 import PageHero from '../../components/ui/PageHero';
 import { Reveal, RevealLines } from '../../components/ui/Reveal';
 import LuxButton from '../../components/ui/LuxButton';
 import Lightbox from '../../components/ui/Lightbox';
 import NotFound from '../NotFound';
 
+const SECTION = { fr: 'Section', en: 'Section', wo: 'Pàcc' };
+
 const EventDetail = () => {
+  const t = useT();
   const { slug = '' } = useParams();
   const event = getEvent(slug);
   const [lightbox, setLightbox] = useState<number | null>(null);
@@ -19,12 +23,20 @@ const EventDetail = () => {
   const index = events.indexOf(event);
   const nextEvent = events[(index + 1) % events.length];
   const gallery = (event.gallery ?? []).map((src) => ({ src, caption: event.title }));
+  const title = t(event.title);
 
   // Premier mot en ivoire, la suite en or (ex. « Dîner » / « de Gala »)
-  const [first, ...rest] = event.title.split(' ');
+  const [first, ...rest] = title.split(' ');
   const titleLines = rest.length
     ? [first, <span className="text-gold-gradient">{rest.join(' ')}</span>]
     : [<span className="text-gold-gradient">{first}</span>];
+
+  const facts = [
+    { k: { fr: 'Période', en: 'When', wo: 'Jamono' }, v: t(MONTHS[event.month]) },
+    { k: { fr: 'Statut', en: 'Status', wo: 'Fan la tollu' }, v: t(statusLabel(event.month)) },
+    { k: SECTION, v: event.section },
+    { k: { fr: 'Thème', en: 'Theme', wo: 'Wàll' }, v: t(event.category) },
+  ];
 
   return (
     <div className="bg-ivory-50">
@@ -32,20 +44,18 @@ const EventDetail = () => {
         tall
         image={event.image}
         imagePosition={event.imagePosition}
-        crumbs={[{ label: 'Événements', to: '/evenements' }, { label: event.title }]}
-        eyebrow={`Section ${event.section} · ${MONTHS[event.month]}`}
+        crumbs={[{ label: t({ fr: 'Événements', en: 'Events', wo: 'Xew-xew' }), to: '/evenements' }, { label: title }]}
+        eyebrow={`${t(SECTION)} ${event.section} · ${t(MONTHS[event.month])}`}
         lines={titleLines}
-        intro={event.tagline}
+        intro={t(event.tagline)}
         aside={
           <div className="grid w-full max-w-sm grid-cols-2 border border-ivory-50/15 bg-ink-950/40 backdrop-blur-md">
-            {[
-              { k: 'Période', v: MONTHS[event.month] },
-              { k: 'Statut', v: statusLabel(event.month) },
-              { k: 'Section', v: event.section },
-              { k: 'Thème', v: event.category },
-            ].map((d, i) => (
-              <div key={d.k} className={`p-5 ${i % 2 ? 'border-l border-ivory-50/10' : ''} ${i > 1 ? 'border-t border-ivory-50/10' : ''}`}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-gold-400">{d.k}</p>
+            {facts.map((d, i) => (
+              <div
+                key={i}
+                className={`p-5 ${i % 2 ? 'border-l border-ivory-50/10' : ''} ${i > 1 ? 'border-t border-ivory-50/10' : ''}`}
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-gold-400">{t(d.k)}</p>
                 <p className="mt-1.5 font-display text-xl text-ivory-50">{d.v}</p>
               </div>
             ))}
@@ -58,10 +68,17 @@ const EventDetail = () => {
         <div className="grid gap-16 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <Reveal>
-              <span className="eyebrow text-gold-700">À propos de l’événement</span>
+              <span className="eyebrow text-gold-700">
+                {t({ fr: 'À propos de l’événement', en: 'About the event', wo: 'Ci mbirum xew-xew bi' })}
+              </span>
             </Reveal>
             <RevealLines
-              lines={['Une initiative', <span className="text-gold-700">porteuse de sens.</span>]}
+              lines={[
+                t({ fr: 'Une initiative', en: 'An initiative', wo: 'Jëf' }),
+                <span className="text-gold-700">
+                  {t({ fr: 'porteuse de sens.', en: 'with purpose.', wo: 'ju am solo.' })}
+                </span>,
+              ]}
               className="h-display mt-6 text-4xl text-ink-950 sm:text-5xl"
             />
             <div className="mt-12 space-y-6">
@@ -70,7 +87,7 @@ const EventDetail = () => {
                   <p
                     className={`leading-relaxed text-ink-900/70 ${i === 0 ? 'font-display text-2xl leading-snug text-ink-950 sm:text-[1.7rem]' : 'text-lg'}`}
                   >
-                    {p}
+                    {t(p)}
                   </p>
                 </Reveal>
               ))}
@@ -85,17 +102,19 @@ const EventDetail = () => {
                   <span className="flex h-14 w-14 items-center justify-center rounded-full border border-gold-500/40 text-gold-400">
                     <Icon className="h-6 w-6" />
                   </span>
-                  <h3 className="mt-8 font-display text-3xl">{event.impactTitle}</h3>
-                  <p className="mt-4 leading-relaxed text-ivory-100/70">{event.impactText}</p>
+                  <h3 className="mt-8 font-display text-3xl">{t(event.impactTitle)}</h3>
+                  <p className="mt-4 leading-relaxed text-ivory-100/70">{t(event.impactText)}</p>
                 </div>
               </Reveal>
               <Reveal delay={0.1} className="border border-ink-900/10 bg-ivory-100 p-10">
-                <h3 className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-700">Impact prévu</h3>
+                <h3 className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-700">
+                  {t({ fr: 'Impact prévu', en: 'Expected impact', wo: 'Njeexital li ñu xaar' })}
+                </h3>
                 <ul className="mt-6 divide-y divide-ink-900/10">
-                  {event.impact.map((item) => (
-                    <li key={item} className="flex items-center gap-4 py-4 font-display text-xl text-ink-950">
-                      <span className="h-1.5 w-1.5 rotate-45 bg-gold-500" />
-                      {item}
+                  {event.impact.map((item, i) => (
+                    <li key={i} className="flex items-center gap-4 py-4 font-display text-xl text-ink-950">
+                      <span className="h-1.5 w-1.5 shrink-0 rotate-45 bg-gold-500" />
+                      {t(item)}
                     </li>
                   ))}
                 </ul>
@@ -109,31 +128,40 @@ const EventDetail = () => {
       <section className="border-y border-ink-900/10 bg-ivory-100 py-28 sm:py-36">
         <div className="container-lux">
           <Reveal>
-            <span className="eyebrow text-gold-700">Objectifs stratégiques</span>
+            <span className="eyebrow text-gold-700">
+              {t({ fr: 'Objectifs stratégiques', en: 'Strategic objectives', wo: 'Sunuy jubluwaay' })}
+            </span>
           </Reveal>
           <RevealLines
-            lines={['Ce que nous', 'voulons accomplir.']}
+            lines={[
+              t({ fr: 'Ce que nous', en: 'What we', wo: 'Li nu bëgg' }),
+              t({ fr: 'voulons accomplir.', en: 'aim to achieve.', wo: 'àgg ci.' }),
+            ]}
             className="h-display mt-6 text-4xl text-ink-950 sm:text-5xl"
           />
           <div className="mt-16 grid gap-px overflow-hidden border border-ink-900/10 bg-ink-900/10 sm:grid-cols-2 lg:grid-cols-3">
             {event.objectives.map((o, i) => (
-              <Reveal key={o} delay={i * 0.06} className="group bg-ivory-50 p-8 transition-colors duration-500 hover:bg-ink-950 sm:p-10">
+              <Reveal
+                key={i}
+                delay={i * 0.06}
+                className="group bg-ivory-50 p-8 transition-colors duration-500 hover:bg-ink-950 sm:p-10"
+              >
                 <div className="flex items-center justify-between">
                   <span className="font-display text-5xl text-gold-500/80">{String(i + 1).padStart(2, '0')}</span>
                   <Check className="h-5 w-5 text-gold-600 transition-colors group-hover:text-gold-400" />
                 </div>
                 <p className="mt-10 text-lg leading-relaxed text-ink-950 transition-colors duration-500 group-hover:text-ivory-50">
-                  {o}
+                  {t(o)}
                 </p>
               </Reveal>
             ))}
             <Reveal className="flex flex-col justify-between bg-gold-500 p-8 sm:p-10">
-              <p className="font-display text-3xl leading-tight text-ink-950">{event.cta.title}</p>
+              <p className="font-display text-3xl leading-tight text-ink-950">{t(event.cta.title)}</p>
               <Link
                 to={event.cta.to}
                 className="group mt-10 inline-flex items-center gap-3 text-xs font-bold uppercase tracking-[0.22em] text-ink-950"
               >
-                {event.cta.label}
+                {t(event.cta.label)}
                 <ArrowUpRight className="h-4 w-4 transition-transform duration-500 group-hover:rotate-45" />
               </Link>
             </Reveal>
@@ -145,20 +173,23 @@ const EventDetail = () => {
       {gallery.length > 0 && (
         <section className="container-lux py-28 sm:py-36">
           <Reveal>
-            <span className="eyebrow text-gold-700">En images</span>
+            <span className="eyebrow text-gold-700">{t({ fr: 'En images', en: 'In pictures', wo: 'Ci nataal' })}</span>
           </Reveal>
-          <RevealLines lines={['Souvenirs d’édition.']} className="h-display mt-6 text-4xl text-ink-950 sm:text-5xl" />
+          <RevealLines
+            lines={[t({ fr: 'Souvenirs d’édition.', en: 'Memories of past editions.', wo: 'Fàttalikoo yi.' })]}
+            className="h-display mt-6 text-4xl text-ink-950 sm:text-5xl"
+          />
           <div className="mt-14 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3">
             {gallery.map((g, i) => (
               <Reveal key={g.src} delay={(i % 3) * 0.08}>
                 <button
                   onClick={() => setLightbox(i)}
                   className="group relative block aspect-[4/5] w-full overflow-hidden rounded-sm"
-                  aria-label="Agrandir la photo"
+                  aria-label={t({ fr: 'Agrandir la photo', en: 'Enlarge photo', wo: 'Yokk nataal bi' })}
                 >
                   <img
                     src={g.src}
-                    alt={g.caption}
+                    alt={title}
                     loading="lazy"
                     className="h-full w-full object-cover transition-transform duration-[1400ms] ease-lux group-hover:scale-105"
                   />
@@ -178,39 +209,43 @@ const EventDetail = () => {
         <div className="container-lux relative z-10 grid gap-16 py-28 sm:py-32 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <Reveal>
-              <span className="eyebrow text-gold-400">Rejoindre l’aventure</span>
+              <span className="eyebrow text-gold-400">
+                {t({ fr: 'Rejoindre l’aventure', en: 'Join the journey', wo: 'Bokk ci yoon wi' })}
+              </span>
             </Reveal>
-            <RevealLines lines={[event.cta.title + '.']} className="h-display mt-6 text-4xl sm:text-5xl" />
+            <RevealLines lines={[t(event.cta.title) + '.']} className="h-display mt-6 text-4xl sm:text-5xl" />
             <Reveal delay={0.15}>
-              <p className="mt-6 max-w-xl text-lg leading-relaxed text-ivory-100/70">{event.cta.text}</p>
+              <p className="mt-6 max-w-xl text-lg leading-relaxed text-ivory-100/70">{t(event.cta.text)}</p>
             </Reveal>
             <Reveal delay={0.25} className="mt-10 flex flex-wrap gap-4">
-              <LuxButton to={event.cta.to}>{event.cta.label}</LuxButton>
+              <LuxButton to={event.cta.to}>{t(event.cta.label)}</LuxButton>
               <Link
                 to="/evenements"
                 className="group inline-flex items-center gap-3 px-2 text-xs font-semibold uppercase tracking-[0.22em] text-ivory-100/70 hover:text-gold-400"
               >
                 <ArrowLeft className="h-4 w-4 transition-transform duration-500 group-hover:-translate-x-1" />
-                Tous les événements
+                {t({ fr: 'Tous les événements', en: 'All events', wo: 'Xew-xew yépp' })}
               </Link>
             </Reveal>
           </div>
           <Reveal delay={0.2} className="lg:col-span-5">
             <Link to={`/evenements/${nextEvent.slug}`} className="group block">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-ivory-100/50">Événement suivant</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-ivory-100/50">
+                {t({ fr: 'Événement suivant', en: 'Next event', wo: 'Xew-xew bi ci topp' })}
+              </p>
               <div className="relative mt-4 aspect-[16/10] overflow-hidden rounded-sm">
                 <img
                   src={nextEvent.image}
-                  alt={nextEvent.title}
+                  alt={t(nextEvent.title)}
                   className={`h-full w-full object-cover transition-transform duration-[1600ms] ease-lux group-hover:scale-105 ${nextEvent.imagePosition ?? ''}`}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink-950/90 to-transparent" />
                 <div className="absolute inset-x-6 bottom-6 flex items-end justify-between gap-4">
                   <div>
                     <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-gold-400">
-                      {MONTHS[nextEvent.month]}
+                      {t(MONTHS[nextEvent.month])}
                     </p>
-                    <p className="mt-1 font-display text-3xl sm:text-4xl">{nextEvent.title}</p>
+                    <p className="mt-1 font-display text-3xl sm:text-4xl">{t(nextEvent.title)}</p>
                   </div>
                   <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gold-500 text-ink-950 transition-transform duration-500 group-hover:rotate-45">
                     <ArrowUpRight className="h-5 w-5" />

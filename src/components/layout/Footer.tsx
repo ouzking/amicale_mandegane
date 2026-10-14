@@ -5,10 +5,21 @@ import logo from '../../assets/LOGO.jpeg';
 import { CONTACT, SOCIALS, telHref } from '../../data/site';
 import { events } from '../../data/events';
 import { scrollToTop } from '../../lib/smooth';
+import { useT } from '../../i18n/context';
 import { Reveal, RevealLines } from '../ui/Reveal';
 import LuxButton from '../ui/LuxButton';
 
 const Footer = () => {
+  const t = useT();
+
+  const institution = [
+    { name: { fr: 'Organisation', en: 'Organisation', wo: 'Mbootaay' }, path: '/organisation' },
+    { name: { fr: 'Section Dakar', en: 'Dakar Section', wo: 'Pàccu Dakar' }, path: '/organisation/dakar' },
+    { name: { fr: 'Section Ziguinchor', en: 'Ziguinchor Section', wo: 'Pàccu Ziguinchor' }, path: '/organisation/ziguinchor' },
+    { name: { fr: 'Membres', en: 'Members', wo: 'Way-bokk' }, path: '/membres' },
+    { name: { fr: 'Partenaires', en: 'Partners', wo: 'Àndandoo' }, path: '/partenaires' },
+    { name: { fr: 'Contact', en: 'Contact', wo: 'Jokkoo' }, path: '/contact' },
+  ];
 
   return (
     <footer className="grain relative overflow-hidden bg-ink-950 text-ivory-100">
@@ -19,18 +30,22 @@ const Footer = () => {
         <div className="grid items-end gap-12 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <Reveal>
-              <span className="eyebrow text-gold-400">Écrivons la suite ensemble</span>
+              <span className="eyebrow text-gold-400">
+                {t({ fr: 'Écrivons la suite ensemble', en: 'Let’s write what comes next', wo: 'Ñu bind ëllëg ànd' })}
+              </span>
             </Reveal>
             <RevealLines
               lines={[
-                'Une communauté engagée',
-                <span className="text-gold-gradient">pour l’excellence durable.</span>,
+                t({ fr: 'Une communauté engagée', en: 'A committed community', wo: 'Askan wu am yéene' }),
+                <span className="text-gold-gradient">
+                  {t({ fr: 'pour l’excellence durable.', en: 'for lasting excellence.', wo: 'ngir xarañ gu yàgg.' })}
+                </span>,
               ]}
               className="h-display mt-6 text-[2.1rem] text-ivory-50 sm:text-5xl lg:text-[3.4rem]"
             />
           </div>
           <Reveal delay={0.2} className="flex flex-wrap gap-4 lg:col-span-4 lg:justify-end">
-            <LuxButton to="/contact">Rejoindre l’AEEOM</LuxButton>
+            <LuxButton to="/contact">{t({ fr: 'Rejoindre l’AEEOM', en: 'Join AEEOM', wo: 'Bokk ci AEEOM' })}</LuxButton>
           </Reveal>
         </div>
       </div>
@@ -46,26 +61,26 @@ const Footer = () => {
             </span>
           </Link>
           <p className="mt-8 max-w-sm text-sm leading-relaxed text-ivory-100/55">
-            Amicale des Élèves et Étudiants Originaires de Mandégane. Une institution engagée pour la transmission
-            du savoir, la solidarité et la transformation sociale.
+            {t({
+              fr: 'Amicale des Élèves et Étudiants Originaires de Mandégane. Une institution engagée pour la transmission du savoir, la solidarité et la transformation sociale.',
+              en: 'Association of Pupils and Students from Mandégane. An institution committed to sharing knowledge, solidarity and social change.',
+              wo: 'Mbootaayu Ndongo yu Juddoo Mandégane. Mbootaay mu am yéene ngir jottali xam-xam, dimbalante ak soppi askan wi.',
+            })}
           </p>
-          <p className="mt-6 font-display text-xl text-gold-300">« S’associer pour mieux servir l’avenir »</p>
+          <p className="mt-6 font-display text-xl text-gold-300">
+            « {t({ fr: 'S’associer pour mieux servir l’avenir', en: 'Uniting to better serve the future', wo: 'Booloo ngir gëna jariñ ëllëg' })} »
+          </p>
         </div>
 
         <div className="lg:col-span-2">
-          <h3 className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-400">Institution</h3>
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-400">
+            {t({ fr: 'Institution', en: 'Institution', wo: 'Mbootaay' })}
+          </h3>
           <ul className="mt-7 space-y-3.5 text-sm">
-            {[
-              { name: 'Organisation', path: '/organisation' },
-              { name: 'Section Dakar', path: '/organisation/dakar' },
-              { name: 'Section Ziguinchor', path: '/organisation/ziguinchor' },
-              { name: 'Membres', path: '/membres' },
-              { name: 'Partenaires', path: '/partenaires' },
-              { name: 'Contact', path: '/contact' },
-            ].map((l) => (
+            {institution.map((l) => (
               <li key={l.path}>
                 <Link to={l.path} className="link-lux text-ivory-100/70 transition-colors hover:text-ivory-50">
-                  {l.name}
+                  {t(l.name)}
                 </Link>
               </li>
             ))}
@@ -73,7 +88,9 @@ const Footer = () => {
         </div>
 
         <div className="lg:col-span-3">
-          <h3 className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-400">Événements</h3>
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-400">
+            {t({ fr: 'Événements', en: 'Events', wo: 'Xew-xew' })}
+          </h3>
           <ul className="mt-7 space-y-3.5 text-sm">
             {events.map((e) => (
               <li key={e.slug}>
@@ -81,7 +98,7 @@ const Footer = () => {
                   to={`/evenements/${e.slug}`}
                   className="link-lux text-ivory-100/70 transition-colors hover:text-ivory-50"
                 >
-                  {e.title}
+                  {t(e.title)}
                 </Link>
               </li>
             ))}
@@ -89,7 +106,9 @@ const Footer = () => {
         </div>
 
         <div className="lg:col-span-3">
-          <h3 className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-400">Contact officiel</h3>
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-400">
+            {t({ fr: 'Contact officiel', en: 'Official contact', wo: 'Jokkoo' })}
+          </h3>
           <div className="mt-7 space-y-3 text-sm">
             {CONTACT.phones.map((p) => (
               <a key={p} href={telHref(p)} className="link-lux block w-fit text-ivory-100/70 hover:text-ivory-50">
@@ -136,19 +155,26 @@ const Footer = () => {
       </div>
 
       <div className="container-lux relative z-10 flex flex-col items-center justify-between gap-6 border-t border-ivory-50/10 py-8 text-xs text-ivory-100/45 md:flex-row">
-        <p>© AEEOM · Institution Académique & Communautaire. Tous droits réservés.</p>
+        <p>
+          ©{' '}
+          {t({
+            fr: 'AEEOM · Institution Académique & Communautaire. Tous droits réservés.',
+            en: 'AEEOM · Academic & Community Institution. All rights reserved.',
+            wo: 'AEEOM · Mbootaayu Jàng ak Askan. Sañ-sañ yépp aj nañu.',
+          })}
+        </p>
         <div className="flex items-center gap-6 uppercase tracking-[0.25em]">
-          <span>Excellence</span>
+          <span>{t({ fr: 'Excellence', en: 'Excellence', wo: 'Xarañ' })}</span>
           <span className="text-gold-500">·</span>
-          <span>Leadership</span>
+          <span>{t({ fr: 'Leadership', en: 'Leadership', wo: 'Njiitlu' })}</span>
           <span className="text-gold-500">·</span>
-          <span>Impact</span>
+          <span>{t({ fr: 'Impact', en: 'Impact', wo: 'Njeexital' })}</span>
         </div>
         <button
           onClick={() => scrollToTop()}
           className="group flex items-center gap-3 uppercase tracking-[0.25em] text-ivory-100/70 transition-colors hover:text-gold-400"
         >
-          Haut de page
+          {t({ fr: 'Haut de page', en: 'Back to top', wo: 'Dellu ci kaw' })}
           <span className="flex h-10 w-10 items-center justify-center rounded-full border border-ivory-50/20 transition-colors group-hover:border-gold-500">
             <ArrowUp className="h-4 w-4 transition-transform duration-500 group-hover:-translate-y-0.5" />
           </span>

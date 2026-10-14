@@ -11,6 +11,7 @@ import SectionTitle from '../components/ui/SectionTitle';
 import { Reveal, RevealLines } from '../components/ui/Reveal';
 import LuxButton from '../components/ui/LuxButton';
 import Field from '../components/ui/Field';
+import { useT } from '../i18n/context';
 
 const EMPTY: PartnershipRequest = {
   organizationName: '',
@@ -21,32 +22,96 @@ const EMPTY: PartnershipRequest = {
   message: '',
 };
 
-const TYPES = [
-  { value: 'Partenariat Stratégique', label: 'Partenariat Stratégique' },
-  { value: 'Sponsoring', label: 'Sponsoring' },
-  { value: 'Collaboration Institutionnelle', label: 'Collaboration Institutionnelle' },
-];
-
 const Partners = () => {
+  const t = useT();
+
+  const types = [
+    { value: 'Partenariat Stratégique', label: t({ fr: 'Partenariat Stratégique', en: 'Strategic Partnership', wo: 'Àndandoo bu Mag' }) },
+    { value: 'Sponsoring', label: t({ fr: 'Sponsoring', en: 'Sponsorship', wo: 'Sponsoring' }) },
+    { value: 'Collaboration Institutionnelle', label: t({ fr: 'Collaboration Institutionnelle', en: 'Institutional Collaboration', wo: 'Liggéey ak Mbootaay' }) },
+  ];
   const [form, setForm] = useState<PartnershipRequest>(EMPTY);
   const [sent, setSent] = useState(false);
 
   const partners = [
-    { name: 'Graphic Téranga', logo: graphicTeranga, category: 'Partenaire stratégique', text: 'Production graphique et audiovisuelle.' },
-    { name: 'Kids Shop', logo: kids, category: 'Partenaire stratégique', text: 'Commerce et distribution.' },
+    {
+      name: 'Graphic Téranga',
+      logo: graphicTeranga,
+      category: t({ fr: 'Partenaire stratégique', en: 'Strategic partner', wo: 'Àndandoo bu mag' }),
+      text: t({ fr: 'Production graphique et audiovisuelle.', en: 'Graphic and audiovisual production.', wo: 'Defar nataal ak widewoo.' }),
+    },
+    {
+      name: 'Kids Shop',
+      logo: kids,
+      category: t({ fr: 'Partenaire stratégique', en: 'Strategic partner', wo: 'Àndandoo bu mag' }),
+      text: t({ fr: 'Commerce et distribution.', en: 'Retail and distribution.', wo: 'Njaay ak séddale.' }),
+    },
   ];
 
   const benefits = [
-    { icon: Award, title: 'Visibilité accrue', text: 'Exposition de votre marque auprès d’une communauté d’étudiants d’élite.' },
-    { icon: Users, title: 'Accès aux talents', text: 'Recrutement privilégié parmi nos membres qualifiés et ambitieux.' },
-    { icon: Handshake, title: 'Impact social', text: 'Contribution directe au développement communautaire de Mandégane.' },
-    { icon: Building2, title: 'RSE & engagement', text: 'Renforcement de votre responsabilité sociétale d’entreprise.' },
+    {
+      icon: Award,
+      title: t({ fr: 'Visibilité accrue', en: 'Greater visibility', wo: 'Siiw gu gëna mag' }),
+      text: t({
+        fr: 'Exposition de votre marque auprès d’une communauté d’étudiants d’élite.',
+        en: 'Exposure for your brand among a community of elite students.',
+        wo: 'Sa mark dina siiw ci biir askanu ndongo yu xarañ.',
+      }),
+    },
+    {
+      icon: Users,
+      title: t({ fr: 'Accès aux talents', en: 'Access to talent', wo: 'Jot ci mën-mën yi' }),
+      text: t({
+        fr: 'Recrutement privilégié parmi nos membres qualifiés et ambitieux.',
+        en: 'Priority recruitment among our qualified and ambitious members.',
+        wo: 'Man ngaa jël ay liggéeykat ci sunuy way-bokk yu xarañ te am yéene.',
+      }),
+    },
+    {
+      icon: Handshake,
+      title: t({ fr: 'Impact social', en: 'Social impact', wo: 'Njeexital ci askan' }),
+      text: t({
+        fr: 'Contribution directe au développement communautaire de Mandégane.',
+        en: 'Direct contribution to the community development of Mandégane.',
+        wo: 'Bokk ci yokkute askanu Mandégane.',
+      }),
+    },
+    {
+      icon: Building2,
+      title: t({ fr: 'RSE & engagement', en: 'CSR & commitment', wo: 'Warugar ak yéene' }),
+      text: t({
+        fr: 'Renforcement de votre responsabilité sociétale d’entreprise.',
+        en: 'Strengthening your corporate social responsibility.',
+        wo: 'Dëgëral sa warugar ci askan wi.',
+      }),
+    },
   ];
 
   const tiers = [
-    { name: 'Stratégique', text: 'Une alliance durable, co-construite autour de projets structurants et d’objectifs partagés.' },
-    { name: 'Sponsor', text: 'Associez votre marque à nos événements phares, du Dîner de Gala à la Caravane Médicale.' },
-    { name: 'Institutionnel', text: 'Collaborations avec universités, collectivités et organismes publics ou associatifs.' },
+    {
+      name: t({ fr: 'Stratégique', en: 'Strategic', wo: 'Bu mag' }),
+      text: t({
+        fr: 'Une alliance durable, co-construite autour de projets structurants et d’objectifs partagés.',
+        en: 'A lasting alliance, built together around structuring projects and shared goals.',
+        wo: 'Àndandoo bu yàgg, bu ñu tabax ànd ci ay yéene yu mag ak jubluwaay yu ñu bokk.',
+      }),
+    },
+    {
+      name: t({ fr: 'Sponsor', en: 'Sponsor', wo: 'Sponsor' }),
+      text: t({
+        fr: 'Associez votre marque à nos événements phares, du Dîner de Gala à la Caravane Médicale.',
+        en: 'Associate your brand with our flagship events, from the Gala Dinner to the Medical Caravan.',
+        wo: 'Boolel sa mark ak sunuy xew-xew yu mag, ci Reeru Gala ba ci Karawaanu Paj.',
+      }),
+    },
+    {
+      name: t({ fr: 'Institutionnel', en: 'Institutional', wo: 'Mbootaay' }),
+      text: t({
+        fr: 'Collaborations avec universités, collectivités et organismes publics ou associatifs.',
+        en: 'Collaborations with universities, local authorities and public or non-profit bodies.',
+        wo: 'Liggéey ak iniwérsite yi, meeri yi ak mbootaay yu nguur walla yu askan.',
+      }),
+    },
   ];
 
   const onChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -82,17 +147,30 @@ const Partners = () => {
     <div className="bg-ivory-50">
       <PageHero
         image={galaTeam}
-        crumbs={[{ label: 'Partenaires' }]}
-        eyebrow="Stratégique · Sponsor · Institutionnel"
-        lines={['Nos', <span className="text-gold-gradient">Partenaires.</span>]}
-        intro="Ensemble pour l’excellence académique et le développement communautaire."
+        crumbs={[{ label: t({ fr: 'Partenaires', en: 'Partners', wo: 'Àndandoo' }) }]}
+        eyebrow={t({ fr: 'Stratégique · Sponsor · Institutionnel', en: 'Strategic · Sponsor · Institutional', wo: 'Bu mag · Sponsor · Mbootaay' })}
+        lines={[
+          t({ fr: 'Nos', en: 'Our', wo: 'Sunuy' }),
+          <span className="text-gold-gradient">{t({ fr: 'Partenaires.', en: 'Partners.', wo: 'Àndandoo.' })}</span>,
+        ]}
+        intro={t({
+          fr: 'Ensemble pour l’excellence académique et le développement communautaire.',
+          en: 'Together for academic excellence and community development.',
+          wo: 'Ànd ngir xarañ ci jàng ak yokkute askan wi.',
+        })}
       >
-        <LuxButton href="#demande">Devenir partenaire</LuxButton>
+        <LuxButton href="#demande">{t({ fr: 'Devenir partenaire', en: 'Become a partner', wo: 'Nekk àndandoo' })}</LuxButton>
       </PageHero>
 
       {/* Ils nous font confiance */}
       <section className="container-lux py-28 sm:py-36">
-        <SectionTitle eyebrow="Ils nous font confiance" lines={['Des alliés', <span className="text-gold-700">de premier rang.</span>]} />
+        <SectionTitle
+          eyebrow={t({ fr: 'Ils nous font confiance', en: 'They trust us', wo: 'Ñoo nu wóolu' })}
+          lines={[
+            t({ fr: 'Des alliés', en: 'First-class', wo: 'Ay àndandoo' }),
+            <span className="text-gold-700">{t({ fr: 'de premier rang.', en: 'allies.', wo: 'yu tedd.' })}</span>,
+          ]}
+        />
         <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {partners.map((p, i) => (
             <Reveal key={p.name} delay={i * 0.1} className="group border border-ink-900/10 bg-ivory-100 p-8 transition-colors duration-700 hover:border-gold-500">
@@ -117,10 +195,10 @@ const Partners = () => {
                 <Plus className="h-6 w-6" />
               </span>
               <p className="mt-6 font-display text-3xl text-ink-950 transition-colors duration-500 group-hover:text-ivory-50">
-                Votre organisation ici
+                {t({ fr: 'Votre organisation ici', en: 'Your organisation here', wo: 'Sa mbootaay fii' })}
               </p>
               <p className="mt-2 text-sm text-ink-900/55 transition-colors duration-500 group-hover:text-ivory-100/60">
-                Rejoignez notre écosystème de partenaires.
+                {t({ fr: 'Rejoignez notre écosystème de partenaires.', en: 'Join our partner ecosystem.', wo: 'Bokkal ci sunuy àndandoo.' })}
               </p>
             </a>
           </Reveal>
@@ -132,9 +210,16 @@ const Partners = () => {
         <div className="container-lux relative z-10">
           <SectionTitle
             dark
-            eyebrow="Pourquoi devenir partenaire"
-            lines={['Une alliance', <span className="text-gold-gradient">qui a du sens.</span>]}
-            text="Un partenariat avec l’AEEOM vous offre des opportunités uniques de collaboration et d’impact."
+            eyebrow={t({ fr: 'Pourquoi devenir partenaire', en: 'Why become a partner', wo: 'Lu tax nga nekk àndandoo' })}
+            lines={[
+              t({ fr: 'Une alliance', en: 'A partnership', wo: 'Àndandoo' }),
+              <span className="text-gold-gradient">{t({ fr: 'qui a du sens.', en: 'with meaning.', wo: 'bu am solo.' })}</span>,
+            ]}
+            text={t({
+              fr: 'Un partenariat avec l’AEEOM vous offre des opportunités uniques de collaboration et d’impact.',
+              en: 'A partnership with AEEOM offers unique opportunities for collaboration and impact.',
+              wo: 'Àndandoo ak AEEOM dafay ubbi ay yoon yu amul moroom ngir liggéey ànd ak am njeexital.',
+            })}
           />
           <div className="mt-16 grid gap-px overflow-hidden border border-ivory-50/10 bg-ivory-50/10 sm:grid-cols-2 lg:grid-cols-4">
             {benefits.map((b, i) => {
@@ -166,46 +251,56 @@ const Partners = () => {
         <div className="grid gap-16 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <Reveal>
-              <span className="eyebrow text-gold-700">Demande de partenariat</span>
+              <span className="eyebrow text-gold-700">{t({ fr: 'Demande de partenariat', en: 'Partnership request', wo: 'Laaj àndandoo' })}</span>
             </Reveal>
             <RevealLines
-              lines={['Construisons', <span className="text-gold-700">ensemble.</span>]}
+              lines={[
+                t({ fr: 'Construisons', en: 'Let’s build', wo: 'Nanu tabax' }),
+                <span className="text-gold-700">{t({ fr: 'ensemble.', en: 'together.', wo: 'ànd.' })}</span>,
+              ]}
               className="h-display mt-6 text-4xl text-ink-950 sm:text-5xl"
             />
             <Reveal delay={0.15}>
               <p className="mt-6 leading-relaxed text-ink-900/60">
-                Rejoignez notre écosystème de partenaires stratégiques. Nous revenons vers vous dans les plus brefs
-                délais pour discuter des modalités.
+                {t({
+                  fr: 'Rejoignez notre écosystème de partenaires stratégiques. Nous revenons vers vous dans les plus brefs délais pour discuter des modalités.',
+                  en: 'Join our ecosystem of strategic partners. We will get back to you shortly to discuss the details.',
+                  wo: 'Bokkal ci sunuy àndandoo. Dinañu la delloo kàddu ci lu gaaw ngir waxtaan ci mbir mi.',
+                })}
               </p>
             </Reveal>
           </div>
           <Reveal delay={0.1} className="lg:col-span-7 lg:col-start-6">
             <form onSubmit={onSubmit} className="space-y-8">
               <div className="grid gap-8 sm:grid-cols-2">
-                <Field name="organizationName" label="Organisation" value={form.organizationName} onChange={onChange} />
-                <Field name="contactPerson" label="Personne de contact" value={form.contactPerson} onChange={onChange} />
+                <Field name="organizationName" label={t({ fr: 'Organisation', en: 'Organisation', wo: 'Mbootaay' })} value={form.organizationName} onChange={onChange} />
+                <Field name="contactPerson" label={t({ fr: 'Personne de contact', en: 'Contact person', wo: 'Ki ñuy jokkoo' })} value={form.contactPerson} onChange={onChange} />
               </div>
               <div className="grid gap-8 sm:grid-cols-2">
-                <Field name="email" type="email" label="Email" value={form.email} onChange={onChange} />
-                <Field name="phone" type="tel" label="Téléphone" value={form.phone} onChange={onChange} />
+                <Field name="email" type="email" label={t({ fr: 'Email', en: 'Email', wo: 'Imeel' })} value={form.email} onChange={onChange} />
+                <Field name="phone" type="tel" label={t({ fr: 'Téléphone', en: 'Phone', wo: 'Telefon' })} value={form.phone} onChange={onChange} />
               </div>
-              <Field name="partnershipType" label="Type de partenariat" value={form.partnershipType} onChange={onChange} options={TYPES} />
-              <Field name="message" label="Décrivez votre projet de partenariat" value={form.message} onChange={onChange} textarea />
+              <Field name="partnershipType" label={t({ fr: 'Type de partenariat', en: 'Partnership type', wo: 'Xeetu àndandoo' })} value={form.partnershipType} onChange={onChange} options={types} />
+              <Field name="message" label={t({ fr: 'Décrivez votre projet de partenariat', en: 'Describe your partnership project', wo: 'Waxal sa yéene ci àndandoo' })} value={form.message} onChange={onChange} textarea />
               <div className="flex flex-wrap items-center gap-6 pt-4">
                 <LuxButton type="submit" variant="dark">
-                  Envoyer via WhatsApp
+                  {t({ fr: 'Envoyer via WhatsApp', en: 'Send via WhatsApp', wo: 'Yónne ci WhatsApp' })}
                 </LuxButton>
                 <button
                   type="button"
                   onClick={sendByEmail}
                   className="link-lux text-xs font-semibold uppercase tracking-[0.22em] text-ink-950"
                 >
-                  Envoyer par email
+                  {t({ fr: 'Envoyer par email', en: 'Send by email', wo: 'Yónne ci imeel' })}
                 </button>
               </div>
               {sent && (
                 <p className="border-l-2 border-gold-500 pl-4 text-sm text-ink-900/70">
-                  Merci ! WhatsApp s’est ouvert avec votre demande préremplie. Nous vous recontactons très vite.
+                  {t({
+                    fr: 'Merci ! WhatsApp s’est ouvert avec votre demande préremplie. Nous vous recontactons très vite.',
+                    en: 'Thank you! WhatsApp has opened with your request ready. We will get back to you very soon.',
+                    wo: 'Jërëjëf ! WhatsApp ubbi na ak sa laaj. Dinañu la jokkoo ci lu gaaw.',
+                  })}
                 </p>
               )}
             </form>

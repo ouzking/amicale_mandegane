@@ -9,6 +9,7 @@ import famille from '../assets/AEEOM.jpeg';
 import dakar from '../assets/0000.jpeg';
 import caravane from '../assets/caravane.jpeg';
 import ziguinchor from '../assets/ziguinchor.jpeg';
+import type { Tr } from '../i18n/core';
 
 export const CONTACT = {
   phones: ['+221 77 179 09 61', '+221 77 437 85 58'],
@@ -17,8 +18,8 @@ export const CONTACT = {
   whatsappPartner: '221784785795',
   location: 'Dakar · Ziguinchor, Sénégal',
   hours: [
-    { days: 'Lundi au Vendredi', time: '9h00 – 18h00' },
-    { days: 'Samedi', time: '10h00 – 16h00' },
+    { days: { fr: 'Lundi au Vendredi', en: 'Monday to Friday', wo: 'Altine ba Àjjuma' } as Tr, time: '9h00 – 18h00' },
+    { days: { fr: 'Samedi', en: 'Saturday', wo: 'Gaawu' } as Tr, time: '10h00 – 16h00' },
   ],
 };
 
@@ -35,26 +36,26 @@ export const whatsappHref = (number: string, text: string) =>
 
 export interface GalleryImage {
   src: string;
-  caption: string;
+  caption: Tr;
 }
 
 export const GALLERY: GalleryImage[] = [
-  { src: groupe, caption: 'La grande famille AEEOM réunie' },
-  { src: gala, caption: 'Dîner de Gala · 2e édition' },
-  { src: xawareTeam, caption: 'Tenue traditionnelle, fierté mandégane' },
-  { src: galaTeam, caption: 'Les membres sur le tapis rouge du Gala' },
-  { src: caravane, caption: 'Caravane Médicale à Mandégane' },
-  { src: portraitA, caption: 'Élégance au Dîner de Gala' },
-  { src: famille, caption: 'Moments de fraternité' },
-  { src: galaGuests, caption: 'Invités du Dîner de Gala' },
-  { src: ziguinchor, caption: 'Section Ziguinchor sur le terrain' },
-  { src: portraitB, caption: 'Le Gala, rendez-vous de prestige' },
-  { src: dakar, caption: 'Section Dakar en mission' },
+  { src: groupe, caption: { fr: 'La grande famille AEEOM réunie', en: 'The great AEEOM family together', wo: 'Njaboot gu mag gu AEEOM ci benn bérab' } },
+  { src: gala, caption: { fr: 'Dîner de Gala · 2e édition', en: 'Gala Dinner · 2nd edition', wo: 'Reeru Gala · ñaareelu yoon' } },
+  { src: xawareTeam, caption: { fr: 'Tenue traditionnelle, fierté mandégane', en: 'Traditional attire, Mandégane pride', wo: 'Yére yu cosaan, ngoru Mandégane' } },
+  { src: galaTeam, caption: { fr: 'Les membres sur le tapis rouge du Gala', en: 'Members on the Gala red carpet', wo: 'Way-bokk yi ci kaaru Gala bi' } },
+  { src: caravane, caption: { fr: 'Caravane Médicale à Mandégane', en: 'Medical Caravan in Mandégane', wo: 'Karawaanu Paj ca Mandégane' } },
+  { src: portraitA, caption: { fr: 'Élégance au Dîner de Gala', en: 'Elegance at the Gala Dinner', wo: 'Rafet ca Reeru Gala ba' } },
+  { src: famille, caption: { fr: 'Moments de fraternité', en: 'Moments of fellowship', wo: 'Ay diir yu mbokk' } },
+  { src: galaGuests, caption: { fr: 'Invités du Dîner de Gala', en: 'Gala Dinner guests', wo: 'Gan yi ca Reeru Gala ba' } },
+  { src: ziguinchor, caption: { fr: 'Section Ziguinchor sur le terrain', en: 'Ziguinchor Section in the field', wo: 'Pàccu Ziguinchor ci jëf' } },
+  { src: portraitB, caption: { fr: 'Le Gala, rendez-vous de prestige', en: 'The Gala, a prestigious occasion', wo: 'Gala bi, ndaje mu tedd' } },
+  { src: dakar, caption: { fr: 'Section Dakar en mission', en: 'Dakar Section on a mission', wo: 'Pàccu Dakar ci liggéey' } },
 ];
 
 export const HERO_SLIDES = [
-  { src: groupe, label: 'Communauté' },
-  { src: gala, label: 'Dîner de Gala' },
-  { src: xawareTeam, label: 'Culture' },
-  { src: caravane, label: 'Engagement' },
+  { src: groupe, label: { fr: 'Communauté', en: 'Community', wo: 'Askan' } as Tr },
+  { src: gala, label: { fr: 'Dîner de Gala', en: 'Gala Dinner', wo: 'Reeru Gala' } as Tr },
+  { src: xawareTeam, label: { fr: 'Culture', en: 'Culture', wo: 'Aada' } as Tr },
+  { src: caravane, label: { fr: 'Engagement', en: 'Commitment', wo: 'Yéene' } as Tr },
 ];

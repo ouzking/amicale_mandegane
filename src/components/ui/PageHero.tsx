@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { RevealLines, EASE } from './Reveal';
+import { useT } from '../../i18n/context';
 
 interface Crumb {
   label: string;
@@ -33,6 +34,7 @@ const PageHero = ({
   children,
   tall,
 }: PageHeroProps) => {
+  const t = useT();
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '22%']);
@@ -72,7 +74,7 @@ const PageHero = ({
             className="mb-10 flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-ivory-100/50"
           >
             <Link to="/" className="link-lux transition-colors hover:text-gold-400">
-              Accueil
+              {t({ fr: 'Accueil', en: 'Home', wo: 'Kër' })}
             </Link>
             {crumbs.map((c) => (
               <span key={c.label} className="flex items-center gap-3">

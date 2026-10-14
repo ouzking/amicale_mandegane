@@ -10,12 +10,14 @@ import PageHero from '../components/ui/PageHero';
 import { Reveal, RevealLines } from '../components/ui/Reveal';
 import LuxButton from '../components/ui/LuxButton';
 import Field from '../components/ui/Field';
+import { useT } from '../i18n/context';
 
 const SITE_URL = 'https://www.aeeom.com';
 
 const EMPTY: ContactMessage = { name: '', email: '', phone: '', address: '', subject: '', message: '' };
 
 const Contact = () => {
+  const t = useT();
   const [form, setForm] = useState<ContactMessage>(EMPTY);
   const [sent, setSent] = useState(false);
 
@@ -50,21 +52,28 @@ const Contact = () => {
   const info = [
     {
       icon: Phone,
-      title: 'Téléphone',
+      title: t({ fr: 'Téléphone', en: 'Phone', wo: 'Telefon' }),
       lines: CONTACT.phones.map((p) => ({ label: p, href: telHref(p) })),
     },
-    { icon: Mail, title: 'Email', lines: [{ label: CONTACT.email, href: `mailto:${CONTACT.email}` }] },
-    { icon: MapPin, title: 'Localisation', lines: [{ label: CONTACT.location }] },
+    { icon: Mail, title: t({ fr: 'Email', en: 'Email', wo: 'Imeel' }), lines: [{ label: CONTACT.email, href: `mailto:${CONTACT.email}` }] },
+    { icon: MapPin, title: t({ fr: 'Localisation', en: 'Location', wo: 'Fu nu nekk' }), lines: [{ label: CONTACT.location }] },
   ];
 
   return (
     <div className="bg-ivory-50">
       <PageHero
         image={famille}
-        crumbs={[{ label: 'Contact' }]}
-        eyebrow="Communication & Relations"
-        lines={['Parlons de', <span className="text-gold-gradient">votre projet.</span>]}
-        intro="Une question, un projet ou une collaboration ? Notre équipe est à votre écoute pour vous accompagner avec professionnalisme et engagement."
+        crumbs={[{ label: t({ fr: 'Contact', en: 'Contact', wo: 'Jokkoo' }) }]}
+        eyebrow={t({ fr: 'Communication & Relations', en: 'Communication & Relations', wo: 'Jokkoo ak Lëkkalo' })}
+        lines={[
+          t({ fr: 'Parlons de', en: 'Let’s talk about', wo: 'Ñu waxtaan ci' }),
+          <span className="text-gold-gradient">{t({ fr: 'votre projet.', en: 'your project.', wo: 'sa yéene.' })}</span>,
+        ]}
+        intro={t({
+          fr: 'Une question, un projet ou une collaboration ? Notre équipe est à votre écoute pour vous accompagner avec professionnalisme et engagement.',
+          en: 'A question, a project or a collaboration? Our team is here to support you with professionalism and commitment.',
+          wo: 'Am nga laaj, ab yéene walla ab liggéey bu ñu man a àndal ? Sunu mbooloo dafa lay déglu ngir dimbali la ak xarañ ak yéene.',
+        })}
       />
 
       <section className="container-lux py-24 sm:py-32">
@@ -72,7 +81,7 @@ const Contact = () => {
           {/* Coordonnées */}
           <div className="lg:col-span-4">
             <Reveal>
-              <span className="eyebrow text-gold-700">Restons connectés</span>
+              <span className="eyebrow text-gold-700">{t({ fr: 'Restons connectés', en: 'Stay in touch', wo: 'Nanu jokkoo' })}</span>
             </Reveal>
             <div className="mt-10 divide-y divide-ink-900/10 border-y border-ink-900/10">
               {info.map((item, i) => {
@@ -104,10 +113,12 @@ const Contact = () => {
                   <Clock className="h-4 w-4" />
                 </span>
                 <div className="flex-1">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-900/45">Horaires</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-900/45">
+                    {t({ fr: 'Horaires', en: 'Opening hours', wo: 'Waxtu yi' })}
+                  </p>
                   {CONTACT.hours.map((h) => (
-                    <div key={h.days} className="mt-2 flex justify-between gap-4 text-sm">
-                      <span className="text-ink-900/60">{h.days}</span>
+                    <div key={h.time} className="mt-2 flex justify-between gap-4 text-sm">
+                      <span className="text-ink-900/60">{t(h.days)}</span>
                       <span className="font-semibold text-ink-950">{h.time}</span>
                     </div>
                   ))}
@@ -118,51 +129,63 @@ const Contact = () => {
 
           {/* Formulaire */}
           <div className="lg:col-span-7 lg:col-start-6">
-            <RevealLines lines={['Envoyez-nous', 'un message.']} className="h-display text-4xl text-ink-950 sm:text-5xl" />
+            <RevealLines
+              lines={[
+                t({ fr: 'Envoyez-nous', en: 'Send us', wo: 'Yónnee nu' }),
+                t({ fr: 'un message.', en: 'a message.', wo: 'ab bataaxal.' }),
+              ]} className="h-display text-4xl text-ink-950 sm:text-5xl" />
             <Reveal delay={0.15}>
               <p className="mt-5 text-ink-900/60">
-                Votre message nous parvient directement sur WhatsApp. Vous pouvez aussi l’envoyer par email.
+                {t({
+                  fr: 'Votre message nous parvient directement sur WhatsApp. Vous pouvez aussi l’envoyer par email.',
+                  en: 'Your message reaches us directly on WhatsApp. You can also send it by email.',
+                  wo: 'Sa bataaxal dafay agsi ci nun ci WhatsApp. Man nga koo yónne itam ci imeel.',
+                })}
               </p>
             </Reveal>
             <Reveal delay={0.2}>
               <form onSubmit={onSubmit} className="mt-12 space-y-8">
                 <div className="grid gap-8 sm:grid-cols-2">
-                  <Field name="name" label="Nom complet" value={form.name} onChange={onChange} />
-                  <Field name="email" type="email" label="Email" value={form.email} onChange={onChange} />
+                  <Field name="name" label={t({ fr: 'Nom complet', en: 'Full name', wo: 'Sa tur ak sa sant' })} value={form.name} onChange={onChange} />
+                  <Field name="email" type="email" label={t({ fr: 'Email', en: 'Email', wo: 'Imeel' })} value={form.email} onChange={onChange} />
                 </div>
                 <div className="grid gap-8 sm:grid-cols-2">
-                  <Field name="phone" type="tel" label="Téléphone" value={form.phone ?? ''} onChange={onChange} />
-                  <Field name="address" label="Adresse" value={form.address ?? ''} onChange={onChange} required={false} />
+                  <Field name="phone" type="tel" label={t({ fr: 'Téléphone', en: 'Phone', wo: 'Telefon' })} value={form.phone ?? ''} onChange={onChange} />
+                  <Field name="address" label={t({ fr: 'Adresse', en: 'Address', wo: 'Fan nga dëkk' })} value={form.address ?? ''} onChange={onChange} required={false} />
                 </div>
                 <Field
                   name="subject"
-                  label="Sujet"
+                  label={t({ fr: 'Sujet', en: 'Subject', wo: 'Mbir mi' })}
                   value={form.subject}
                   onChange={onChange}
                   options={[
-                    { value: "Demande d'information", label: "Demande d'information" },
-                    { value: 'Adhésion', label: 'Adhésion à l’AEEOM' },
-                    { value: 'Proposition de projet', label: 'Proposition de projet' },
-                    { value: 'Partenariat', label: 'Partenariat' },
-                    { value: 'Autre', label: 'Autre' },
+                    { value: "Demande d'information", label: t({ fr: "Demande d'information", en: 'Information request', wo: 'Laaj xibaar' }) },
+                    { value: 'Adhésion', label: t({ fr: 'Adhésion à l’AEEOM', en: 'Joining AEEOM', wo: 'Bokk ci AEEOM' }) },
+                    { value: 'Proposition de projet', label: t({ fr: 'Proposition de projet', en: 'Project proposal', wo: 'Indi ab yéene' }) },
+                    { value: 'Partenariat', label: t({ fr: 'Partenariat', en: 'Partnership', wo: 'Àndandoo' }) },
+                    { value: 'Autre', label: t({ fr: 'Autre', en: 'Other', wo: 'Leneen' }) },
                   ]}
                 />
-                <Field name="message" label="Votre message" value={form.message} onChange={onChange} textarea />
+                <Field name="message" label={t({ fr: 'Votre message', en: 'Your message', wo: 'Sa bataaxal' })} value={form.message} onChange={onChange} textarea />
                 <div className="flex flex-wrap items-center gap-6 pt-4">
                   <LuxButton type="submit" variant="dark">
-                    Envoyer via WhatsApp
+                    {t({ fr: 'Envoyer via WhatsApp', en: 'Send via WhatsApp', wo: 'Yónne ci WhatsApp' })}
                   </LuxButton>
                   <button
                     type="button"
                     onClick={sendByEmail}
                     className="link-lux text-xs font-semibold uppercase tracking-[0.22em] text-ink-950"
                   >
-                    Envoyer par email
+                    {t({ fr: 'Envoyer par email', en: 'Send by email', wo: 'Yónne ci imeel' })}
                   </button>
                 </div>
                 {sent && (
                   <p className="border-l-2 border-gold-500 pl-4 text-sm text-ink-900/70">
-                    Merci ! WhatsApp s’est ouvert avec votre message prérempli : il ne reste qu’à l’envoyer.
+                    {t({
+                      fr: 'Merci ! WhatsApp s’est ouvert avec votre message prérempli : il ne reste qu’à l’envoyer.',
+                      en: 'Thank you! WhatsApp has opened with your message ready: just press send.',
+                      wo: 'Jërëjëf ! WhatsApp ubbi na ak sa bataaxal : yónne ko rekk a des.',
+                    })}
                   </p>
                 )}
               </form>
@@ -180,11 +203,11 @@ const Contact = () => {
             style={{ border: 0 }}
             allowFullScreen
             loading="lazy"
-            title="Localisation de Mandégane"
+            title={t({ fr: 'Localisation de Mandégane', en: 'Location of Mandégane', wo: 'Fu Mandégane nekk' })}
           />
         </div>
         <div className="grain relative flex flex-col items-center justify-center overflow-hidden bg-ink-950 px-8 py-20 text-center text-ivory-50 lg:col-span-4">
-          <span className="eyebrow relative z-10 text-gold-400">Partagez l’AEEOM</span>
+          <span className="eyebrow relative z-10 text-gold-400">{t({ fr: 'Partagez l’AEEOM', en: 'Share AEEOM', wo: 'Séddoo AEEOM' })}</span>
           <div className="relative z-10 mt-8 bg-ivory-50 p-4">
             <QRCodeSVG value={SITE_URL} size={180} level="H" bgColor="#FBF9F4" fgColor="#06140E" />
             <img
@@ -195,7 +218,11 @@ const Contact = () => {
           </div>
           <p className="relative z-10 mt-6 font-display text-2xl">www.aeeom.com</p>
           <p className="relative z-10 mt-2 max-w-xs text-sm text-ivory-100/60">
-            Scannez pour retrouver le site officiel et le partager autour de vous.
+            {t({
+              fr: 'Scannez pour retrouver le site officiel et le partager autour de vous.',
+              en: 'Scan to open the official website and share it with those around you.',
+              wo: 'Scanne ko ngir gis site bi te séddoo ko ak say nit.',
+            })}
           </p>
         </div>
       </section>
